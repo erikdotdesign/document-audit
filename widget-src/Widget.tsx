@@ -83,7 +83,7 @@ const Widget = () => {
     label: 'auto layout frames',
     route: 'layout'
   },{
-    highlight: stats?.performance.approxDocumentSizeKB,
+    highlight: stats?.performance.approxDocumentSize,
     label: 'document size',
     route: 'performance'
   },{

@@ -10,6 +10,12 @@ interface StatDetailsProps {
 }
 
 const StatDetails = ({ stats, route }: StatDetailsProps) => {
+
+  const formatKey = (key) => {
+    const result = key.replace(/([a-z])([A-Z])/g, '$1 $2');
+    return result.charAt(0).toUpperCase() + result.slice(1).toLowerCase();
+  }
+
   return (
     <AutoLayout
       direction={'vertical'}
@@ -33,7 +39,7 @@ const StatDetails = ({ stats, route }: StatDetailsProps) => {
               fontSize={24}
               lineHeight={32}
               fontWeight={800}>
-              { key }
+              { formatKey(key) }
             </Text>
             <Text
               fontFamily={'Inter'}

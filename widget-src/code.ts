@@ -1,10 +1,12 @@
+// Types
 export type LayerStats = {
   totalLayers: number;
   frames: number;
   components: number;
   componentInstances: number;
   textLayers: number;
-  imageFills: { embedded: number; linked: number };
+  embeddedImageFills: number;
+  linkedImageFills: number;
   vectorPaths: number;
   hiddenLayers: number;
   lockedLayers: number;
@@ -13,13 +15,13 @@ export type LayerStats = {
 };
 
 export type ColorStats = {
-  uniqueFillColors: Set<string>;
-  uniqueStrokeColors: Set<string>;
-  uniqueTextStyles: Set<string>;
-  localTextStyles: Set<string>;
-  remoteTextStyles: Set<string>;
+  uniqueFillColors: number;
+  uniqueStrokeColors: number;
+  uniqueTextStyles: number;
+  localTextStyles: number;
+  remoteTextStyles: number;
   colorTokenUsage: number;
-  unusedStyles: string[];
+  unusedTextStyles: number;
 };
 
 export type ComponentStats = {
@@ -31,10 +33,13 @@ export type ComponentStats = {
 };
 
 export type TextStats = {
-  uniqueFonts: Set<string>;
-  uniqueFontSizes: Set<number>;
+  uniqueFonts: number;
+  uniqueFontSizes: number;
   textWithoutStyle: number;
-  textAlignments: Record<string, number>;
+  leftAlign: number;
+  centerAlign: number;
+  rightAlign: number;
+  justifiedAlign: number;
 };
 
 export type LayoutStats = {
@@ -45,8 +50,8 @@ export type LayoutStats = {
 };
 
 export type PerformanceStats = {
-  largestImageSizeKB: number;
-  approxDocumentSizeKB: number;
+  largestImageSize: string;
+  approxDocumentSize: string;
   maxNestingDepth: number;
   pageCount: number;
   isHeavy: boolean;
@@ -56,7 +61,7 @@ export type NamingStats = {
   unnamedLayers: number;
   framelessLayers: number;
   topLevelUngrouped: number;
-  duplicateLayerNames: Record<string, number>;
+  duplicateLayerNames: number;
 };
 
 export type AuditStats = {
@@ -69,16 +74,6 @@ export type AuditStats = {
   naming: NamingStats;
 };
 
-const solidPaintToHex = (paint: SolidPaint): string => {
-  const r = Math.round(paint.color.r * 255);
-  const g = Math.round(paint.color.g * 255);
-  const b = Math.round(paint.color.b * 255);
-  const alpha = paint.opacity !== undefined ? paint.opacity : 1;
-  return `#${[r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")}${
-    alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, "0") : ""
-  }`;
-};
-
 export const auditStats: AuditStats = {
   layers: {
     totalLayers: 0,
@@ -86,7 +81,8 @@ export const auditStats: AuditStats = {
     components: 0,
     componentInstances: 0,
     textLayers: 0,
-    imageFills: { embedded: 0, linked: 0 },
+    embeddedImageFills: 0,
+    linkedImageFills: 0,
     vectorPaths: 0,
     hiddenLayers: 0,
     lockedLayers: 0,
@@ -94,13 +90,13 @@ export const auditStats: AuditStats = {
     unflattenedLayers: 0,
   },
   colors: {
-    uniqueFillColors: new Set(),
-    uniqueStrokeColors: new Set(),
-    uniqueTextStyles: new Set(),
-    localTextStyles: new Set(),
-    remoteTextStyles: new Set(),
+    uniqueFillColors: 0,
+    uniqueStrokeColors: 0,
+    uniqueTextStyles: 0,
+    localTextStyles: 0,
+    remoteTextStyles: 0,
     colorTokenUsage: 0,
-    unusedStyles: [],
+    unusedTextStyles: 0,
   },
   components: {
     localComponents: 0,
@@ -110,10 +106,13 @@ export const auditStats: AuditStats = {
     overriddenInstances: 0,
   },
   text: {
-    uniqueFonts: new Set(),
-    uniqueFontSizes: new Set(),
+    uniqueFonts: 0,
+    uniqueFontSizes: 0,
     textWithoutStyle: 0,
-    textAlignments: {},
+    leftAlign: 0,
+    centerAlign: 0,
+    rightAlign: 0,
+    justifiedAlign: 0,
   },
   layout: {
     autoLayoutFrames: 0,
@@ -122,8 +121,8 @@ export const auditStats: AuditStats = {
     irregularSpacing: 0,
   },
   performance: {
-    largestImageSizeKB: 0,
-    approxDocumentSizeKB: 0,
+    largestImageSize: "0 KB",
+    approxDocumentSize: "0 KB",
     maxNestingDepth: 0,
     pageCount: 0,
     isHeavy: false,
@@ -132,22 +131,34 @@ export const auditStats: AuditStats = {
     unnamedLayers: 0,
     framelessLayers: 0,
     topLevelUngrouped: 0,
-    duplicateLayerNames: {},
+    duplicateLayerNames: 0,
   },
 };
 
 export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditStats> => {
   const pages = figma.root.children;
+
   const imageHashes = new Set<string>();
   const textStyleIds = new Set<string>();
   const instanceNodes: InstanceNode[] = [];
 
+  const fillColors = new Set<string>();
+  const strokeColors = new Set<string>();
+  const textStyles = new Set<string>();
+  const localTextStyles = new Set<string>();
+  const remoteTextStyles = new Set<string>();
+  const fonts = new Set<string>();
+  const fontSizes = new Set<number>();
+  const duplicateNames = new Map<string, number>();
+
+  const unusedTextStyleNames: string[] = [];
+
   const stats: AuditStats = {
-    ...auditStats,
+    ...auditStats
   };
 
-  stats.performance.pageCount = pages.length;
-  stats.performance.isHeavy = allNodes.length > 10000;
+  auditStats.performance.pageCount = pages.length;
+  auditStats.performance.isHeavy = allNodes.length > 10000;
 
   const getDepth = (node: SceneNode): number => {
     let depth = 0;
@@ -159,25 +170,44 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     return depth;
   };
 
+  const solidPaintToHex = (paint: SolidPaint): string => {
+    const r = Math.round(paint.color.r * 255);
+    const g = Math.round(paint.color.g * 255);
+    const b = Math.round(paint.color.b * 255);
+    const alpha = paint.opacity !== undefined ? paint.opacity : 1;
+    return `#${[r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")}${alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, "0") : ""}`;
+  };
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return "0 B";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    const index = Math.floor(Math.log(bytes) / Math.log(1024));
+    const value = bytes / Math.pow(1024, index);
+    return `${value.toFixed(1)} ${units[index]}`;
+  };
+
   for (const node of allNodes) {
     try {
       stats.layers.totalLayers++;
       if (!node.visible) stats.layers.hiddenLayers++;
       if (node.locked) stats.layers.lockedLayers++;
       if (!node.name) stats.naming.unnamedLayers++;
+
       const depth = getDepth(node);
       stats.performance.maxNestingDepth = Math.max(stats.performance.maxNestingDepth, depth);
-      stats.naming.duplicateLayerNames[node.name] = (stats.naming.duplicateLayerNames[node.name] || 0) + 1;
+
+      duplicateNames.set(node.name, (duplicateNames.get(node.name) || 0) + 1);
       if (!node.parent || node.parent.type === "PAGE") stats.naming.topLevelUngrouped++;
 
       if ("fills" in node && Array.isArray(node.fills)) {
         for (const fill of node.fills) {
           if (fill.type === "SOLID") {
-            stats.colors.uniqueFillColors.add(solidPaintToHex(fill));
+            fillColors.add(solidPaintToHex(fill));
             if (fill.boundVariables?.color) stats.colors.colorTokenUsage++;
           } else if (fill.type === "IMAGE" && fill.imageHash) {
             imageHashes.add(fill.imageHash);
-            stats.layers.imageFills[fill.scaleMode === "FILL" ? "embedded" : "linked"]++;
+            if (fill.scaleMode === "FILL") stats.layers.embeddedImageFills++;
+            else stats.layers.linkedImageFills++;
           }
         }
       }
@@ -185,7 +215,7 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
       if ("strokes" in node && Array.isArray(node.strokes)) {
         for (const stroke of node.strokes) {
           if (stroke.type === "SOLID") {
-            stats.colors.uniqueStrokeColors.add(solidPaintToHex(stroke));
+            strokeColors.add(solidPaintToHex(stroke));
             if (stroke.boundVariables?.color) stats.colors.colorTokenUsage++;
           }
         }
@@ -220,17 +250,22 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           break;
         case "TEXT":
           stats.layers.textLayers++;
-          stats.text.uniqueFontSizes.add(node.fontSize as number);
+          fontSizes.add(node.fontSize as number);
           if (typeof node.fontName === "object" && "family" in node.fontName) {
-            stats.text.uniqueFonts.add(`${node.fontName.family} ${node.fontName.style}`);
+            fonts.add(`${node.fontName.family} ${node.fontName.style}`);
           }
           if (!node.textStyleId) stats.text.textWithoutStyle++;
           else {
             const id = node.textStyleId.toString();
-            stats.colors.uniqueTextStyles.add(id);
+            textStyles.add(id);
             textStyleIds.add(id);
           }
-          stats.text.textAlignments[node.textAlignHorizontal] = (stats.text.textAlignments[node.textAlignHorizontal] || 0) + 1;
+          switch (node.textAlignHorizontal) {
+            case "LEFT": stats.text.leftAlign++; break;
+            case "CENTER": stats.text.centerAlign++; break;
+            case "RIGHT": stats.text.rightAlign++; break;
+            case "JUSTIFIED": stats.text.justifiedAlign++; break;
+          }
           break;
         case "VECTOR":
           stats.layers.vectorPaths++;
@@ -250,6 +285,7 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   // Batch image sizes
   let totalBytes = 0;
   let maxBytes = 0;
+
   await Promise.allSettled([...imageHashes].map(async (hash) => {
     try {
       const image = figma.getImageByHash(hash);
@@ -261,10 +297,10 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
       }
     } catch {}
   }));
-  stats.performance.largestImageSizeKB = Math.round(maxBytes / 1024);
-  stats.performance.approxDocumentSizeKB = Math.round(totalBytes / 1024);
 
-  // Instance linkage stats
+  stats.performance.largestImageSize = formatBytes(maxBytes);
+  stats.performance.approxDocumentSize = formatBytes(totalBytes);
+
   for (const node of instanceNodes) {
     try {
       const mainComponent = await node.getMainComponentAsync();
@@ -275,21 +311,33 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     } catch {}
   }
 
-  // Text style resolution
   for (const styleId of textStyleIds) {
     try {
       const style = await figma.getStyleByIdAsync(styleId);
-      if (style?.remote) stats.colors.remoteTextStyles.add(style.name);
-      else if (style) stats.colors.localTextStyles.add(style.name);
+      if (style?.remote) remoteTextStyles.add(style.name);
+      else if (style) localTextStyles.add(style.name);
     } catch {}
   }
 
   const localStyles = await figma.getLocalTextStylesAsync();
   for (const style of localStyles) {
-    if (!stats.colors.localTextStyles.has(style.name)) {
-      stats.colors.unusedStyles.push(style.name);
+    if (!localTextStyles.has(style.name)) {
+      unusedTextStyleNames.push(style.name);
     }
   }
+
+  // Finalize counts
+  stats.colors.uniqueFillColors = fillColors.size;
+  stats.colors.uniqueStrokeColors = strokeColors.size;
+  stats.colors.uniqueTextStyles = textStyles.size;
+  stats.colors.localTextStyles = localTextStyles.size;
+  stats.colors.remoteTextStyles = remoteTextStyles.size;
+  stats.colors.unusedTextStyles = unusedTextStyleNames.length;
+
+  stats.text.uniqueFonts = fonts.size;
+  stats.text.uniqueFontSizes = fontSizes.size;
+
+  stats.naming.duplicateLayerNames = Array.from(duplicateNames.values()).filter(v => v > 1).length;
 
   return stats;
 };
