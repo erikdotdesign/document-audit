@@ -67,7 +67,7 @@ const Widget = () => {
     label: 'total layers',
     route: 'layers'
   },{
-    highlight: stats?.colors.uniqueFillColors.size,
+    highlight: stats?.colors.uniqueFillColors,
     label: 'colors',
     route: 'colors'
   },{
