@@ -44,7 +44,8 @@ const Widget = () => {
       console.log(stats);
       return;
     }
-
+    
+    figma.notify('Auditing 🔎', { timeout: Infinity });
     await new Promise((res) => setTimeout(res, 0)); // defer until Figma's graph is ready
     console.log("⏳ Starting scene graph hydration...");
     await hydrateSceneGraph();
@@ -56,6 +57,7 @@ const Widget = () => {
     setStats(auditStats);
     setLastAuditKey(currentAuditKey);
     setLoading(false);
+    figma.closePlugin();
   };
 
   useEffect(() => {

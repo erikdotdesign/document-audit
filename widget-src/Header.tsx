@@ -39,13 +39,8 @@ const Header = ({ route, setRoute }: HeaderProps) => {
         fontSize={style.fontSize.medium}
         lineHeight={style.lineHeight.medium}
         fontWeight={style.fontWeight.bold}>
-        {
-          route
-          ? ' '
-          : null
-        }
         <Span fill={route ? style.color.gray : style.color.black}>
-          {`Document Audit ${route ? '/' : ''} `}
+          {`${route ? ' ' : ''}Document Audit ${route ? '/' : ''} `}
         </Span>
         {
           route
