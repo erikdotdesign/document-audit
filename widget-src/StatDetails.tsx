@@ -22,8 +22,8 @@ const StatDetails = ({ stats, route }: StatDetailsProps) => {
       width={'fill-parent'}
       height={'fill-parent'}
       padding={{
-        left: 32,
-        right: 32
+        left: style.spacing.large,
+        right: style.spacing.large
       }}>
       {
         Object.keys(stats[route]).map((key, index) => (
@@ -31,21 +31,21 @@ const StatDetails = ({ stats, route }: StatDetailsProps) => {
             key={key}
             width={'fill-parent'}
             spacing={'auto'}
-            padding={16}
+            padding={style.spacing.medium}
             fill={index % 2 ? style.color.white : style.color.lightGray}
-            cornerRadius={8}>
+            cornerRadius={style.cornerRadius}>
             <Text
-              fontFamily={'Inter'}
-              fontSize={24}
-              lineHeight={32}
-              fontWeight={800}>
+              fontFamily={style.fontFamily}
+              fontSize={style.fontSize.shmedium}
+              lineHeight={style.lineHeight.shmedium}
+              fontWeight={style.fontWeight.bold}>
               { formatKey(key) }
             </Text>
             <Text
-              fontFamily={'Inter'}
-              fontSize={24}
-              lineHeight={32}
-              fontWeight={800}>
+              fontFamily={style.fontFamily}
+              fontSize={style.fontSize.shmedium}
+              lineHeight={style.lineHeight.shmedium}
+              fontWeight={style.fontWeight.bold}>
               { `${stats[route][key]}` }
             </Text>
           </AutoLayout>

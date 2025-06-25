@@ -22,20 +22,20 @@ const AuditButton = ({ loading, setLoading, setCurrentAuditKey }: AuditButtonPro
     <AutoLayout
       verticalAlignItems={'center'}
       horizontalAlignItems={'center'}
-      padding={12}
-      cornerRadius={8}
+      padding={style.spacing.shmedium}
+      cornerRadius={style.cornerRadius}
       fill={style.color.white}
       stroke={style.color.black}
-      strokeWidth={1}
+      strokeWidth={2}
       hoverStyle={{
         fill: style.color.lightGray
       }}
       onClick={handleClick}>
       <Text 
-        fontFamily={'Inter'}
-        fontSize={16}
-        lineHeight={24}
-        fontWeight={800}
+        fontFamily={style.fontFamily}
+        fontSize={style.fontSize.small}
+        lineHeight={style.lineHeight.small}
+        fontWeight={style.fontWeight.bold}
         fill={style.color.black}>
         Run audit
       </Text>

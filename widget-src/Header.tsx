@@ -17,14 +17,14 @@ const Header = ({ route, setRoute }: HeaderProps) => {
   return (
     <AutoLayout 
       width={'fill-parent'}
-      padding={32}>
+      padding={style.spacing.large}>
       {
         route
         ? <Text
-            fontFamily={'Inter'}
-            fontSize={32}
-            lineHeight={40}
-            fontWeight={800}
+            fontFamily={style.fontFamily}
+            fontSize={style.fontSize.medium}
+            lineHeight={style.lineHeight.medium}
+            fontWeight={style.fontWeight.bold}
             fill={style.color.gray}
             onClick={handleClick}
             hoverStyle={{
@@ -35,10 +35,10 @@ const Header = ({ route, setRoute }: HeaderProps) => {
         : null
       }
       <Text 
-        fontFamily={'Inter'}
-        fontSize={32}
-        lineHeight={40}
-        fontWeight={800}>
+        fontFamily={style.fontFamily}
+        fontSize={style.fontSize.medium}
+        lineHeight={style.lineHeight.medium}
+        fontWeight={style.fontWeight.bold}>
         {
           route
           ? ' '

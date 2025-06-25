@@ -32,23 +32,24 @@ const Footer = ({ lastAuditKey, loading, setLoading, setCurrentAuditKey }: Foote
 
   return (
     <AutoLayout 
+      verticalAlignItems='center'
       width={'fill-parent'}
       spacing={'auto'}
-      padding={32}>
+      padding={style.spacing.large}>
       <AutoLayout direction='vertical'>
         <Text 
-          fontFamily={'Inter'}
-          fontSize={16}
-          lineHeight={24}
-          fontWeight={800}
+          fontFamily={style.fontFamily}
+          fontSize={style.fontSize.small}
+          lineHeight={style.lineHeight.small}
+          fontWeight={style.fontWeight.bold}
           fill={style.color.black}>
           Last audit
         </Text>
         <Text 
-          fontFamily={'Inter'}
-          fontSize={16}
-          lineHeight={24}
-          fontWeight={500}
+          fontFamily={style.fontFamily}
+          fontSize={style.fontSize.small}
+          lineHeight={style.lineHeight.small}
+          fontWeight={style.fontWeight.normal}
           fill={style.color.black}>
           {formatDate(lastAuditKey)}
         </Text>

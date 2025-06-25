@@ -21,19 +21,21 @@ const DisplayStat = ({ highlight = 0, label, route, setRoute }: DisplayStatProps
       width={'fill-parent'}
       fill={style.color.white}
       padding={{
-        left: 32,
-        right: 32
+        left: style.spacing.large,
+        right: style.spacing.large
       }}
       hoverStyle={{
         fill: style.color.lightGray
       }}
       onClick={handleClick}>
       <Text 
-        fontFamily={'Inter'}
-        fontSize={56}
-        lineHeight={128}
-        fontWeight={800}>
-        <Span fill={style.color.black}>
+        fontFamily={style.fontFamily}
+        fontSize={style.fontSize.large}
+        lineHeight={style.lineHeight.large}
+        fontWeight={style.fontWeight.bold}>
+        <Span 
+          fill={style.color.black}
+          fontWeight={style.fontWeight.black}>
           {highlight}
         </Span>
           {` `}

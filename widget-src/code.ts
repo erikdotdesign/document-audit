@@ -1,4 +1,3 @@
-// Types
 export type LayerStats = {
   totalLayers: number;
   frames: number;
@@ -7,6 +6,7 @@ export type LayerStats = {
   textLayers: number;
   embeddedImageFills: number;
   linkedImageFills: number;
+  brokenImages: number;
   vectorPaths: number;
   hiddenLayers: number;
   lockedLayers: number;
@@ -17,11 +17,7 @@ export type LayerStats = {
 export type ColorStats = {
   uniqueFillColors: number;
   uniqueStrokeColors: number;
-  uniqueTextStyles: number;
-  localTextStyles: number;
-  remoteTextStyles: number;
   colorTokenUsage: number;
-  unusedTextStyles: number;
 };
 
 export type ComponentStats = {
@@ -30,16 +26,17 @@ export type ComponentStats = {
   variantSets: number;
   missingInstances: number;
   overriddenInstances: number;
+  missingDescriptions: number;
 };
 
 export type TextStats = {
   uniqueFonts: number;
   uniqueFontSizes: number;
   textWithoutStyle: number;
-  leftAlign: number;
-  centerAlign: number;
-  rightAlign: number;
-  justifiedAlign: number;
+  uniqueTextStyles: number;
+  localTextStyles: number;
+  remoteTextStyles: number;
+  unusedTextStyles: number;
 };
 
 export type LayoutStats = {
@@ -83,6 +80,7 @@ export const auditStats: AuditStats = {
     textLayers: 0,
     embeddedImageFills: 0,
     linkedImageFills: 0,
+    brokenImages: 0,
     vectorPaths: 0,
     hiddenLayers: 0,
     lockedLayers: 0,
@@ -92,11 +90,7 @@ export const auditStats: AuditStats = {
   colors: {
     uniqueFillColors: 0,
     uniqueStrokeColors: 0,
-    uniqueTextStyles: 0,
-    localTextStyles: 0,
-    remoteTextStyles: 0,
     colorTokenUsage: 0,
-    unusedTextStyles: 0,
   },
   components: {
     localComponents: 0,
@@ -104,15 +98,16 @@ export const auditStats: AuditStats = {
     variantSets: 0,
     missingInstances: 0,
     overriddenInstances: 0,
+    missingDescriptions: 0,
   },
   text: {
     uniqueFonts: 0,
     uniqueFontSizes: 0,
     textWithoutStyle: 0,
-    leftAlign: 0,
-    centerAlign: 0,
-    rightAlign: 0,
-    justifiedAlign: 0,
+    uniqueTextStyles: 0,
+    localTextStyles: 0,
+    remoteTextStyles: 0,
+    unusedTextStyles: 0,
   },
   layout: {
     autoLayoutFrames: 0,
@@ -121,8 +116,8 @@ export const auditStats: AuditStats = {
     irregularSpacing: 0,
   },
   performance: {
-    largestImageSize: "0 KB",
-    approxDocumentSize: "0 KB",
+    largestImageSize: "0 B",
+    approxDocumentSize: "0 B",
     maxNestingDepth: 0,
     pageCount: 0,
     isHeavy: false,
@@ -157,8 +152,8 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     ...auditStats
   };
 
-  auditStats.performance.pageCount = pages.length;
-  auditStats.performance.isHeavy = allNodes.length > 10000;
+  stats.performance.pageCount = pages.length;
+  stats.performance.isHeavy = allNodes.length > 10000;
 
   const getDepth = (node: SceneNode): number => {
     let depth = 0;
@@ -204,10 +199,13 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           if (fill.type === "SOLID") {
             fillColors.add(solidPaintToHex(fill));
             if (fill.boundVariables?.color) stats.colors.colorTokenUsage++;
-          } else if (fill.type === "IMAGE" && fill.imageHash) {
-            imageHashes.add(fill.imageHash);
-            if (fill.scaleMode === "FILL") stats.layers.embeddedImageFills++;
-            else stats.layers.linkedImageFills++;
+          } else if (fill.type === "IMAGE") {
+            if (!fill.imageHash) stats.layers.brokenImages++;
+            else {
+              imageHashes.add(fill.imageHash);
+              if (fill.scaleMode === "FILL") stats.layers.embeddedImageFills++;
+              else stats.layers.linkedImageFills++;
+            }
           }
         }
       }
@@ -238,11 +236,13 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           stats.layers.frames++;
           if (node.layoutMode !== "NONE") stats.layout.autoLayoutFrames++;
           if (node.layoutGrids.length > 0) stats.layout.layoutGrids++;
+          if (!node.description?.trim()) stats.components.missingDescriptions++;
           break;
         case "COMPONENT":
           stats.layers.components++;
           stats.components.localComponents++;
           if (node.parent?.type === "COMPONENT_SET") stats.components.variantSets++;
+          if (!node.description?.trim()) stats.components.missingDescriptions++;
           break;
         case "INSTANCE":
           stats.layers.componentInstances++;
@@ -260,12 +260,6 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
             textStyles.add(id);
             textStyleIds.add(id);
           }
-          switch (node.textAlignHorizontal) {
-            case "LEFT": stats.text.leftAlign++; break;
-            case "CENTER": stats.text.centerAlign++; break;
-            case "RIGHT": stats.text.rightAlign++; break;
-            case "JUSTIFIED": stats.text.justifiedAlign++; break;
-          }
           break;
         case "VECTOR":
           stats.layers.vectorPaths++;
@@ -282,7 +276,6 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     }
   }
 
-  // Batch image sizes
   let totalBytes = 0;
   let maxBytes = 0;
 
@@ -326,18 +319,18 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     }
   }
 
-  // Finalize counts
-  stats.colors.uniqueFillColors = fillColors.size;
-  stats.colors.uniqueStrokeColors = strokeColors.size;
-  stats.colors.uniqueTextStyles = textStyles.size;
-  stats.colors.localTextStyles = localTextStyles.size;
-  stats.colors.remoteTextStyles = remoteTextStyles.size;
-  stats.colors.unusedTextStyles = unusedTextStyleNames.length;
+  stats.text.uniqueTextStyles = textStyles.size;
+  stats.text.localTextStyles = localTextStyles.size;
+  stats.text.remoteTextStyles = remoteTextStyles.size;
+  stats.text.unusedTextStyles = unusedTextStyleNames.length;
 
   stats.text.uniqueFonts = fonts.size;
   stats.text.uniqueFontSizes = fontSizes.size;
 
   stats.naming.duplicateLayerNames = Array.from(duplicateNames.values()).filter(v => v > 1).length;
+
+  stats.colors.uniqueFillColors = fillColors.size;
+  stats.colors.uniqueStrokeColors = strokeColors.size;
 
   return stats;
 };

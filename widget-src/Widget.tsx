@@ -97,7 +97,9 @@ const Widget = () => {
       direction="vertical"
       width={834}
       height={1194}
-      fill={style.color.white}>
+      fill={style.color.white}
+      stroke={style.color.black}
+      strokeWidth={8}>
       <Header 
         route={route}
         setRoute={setRoute} />
