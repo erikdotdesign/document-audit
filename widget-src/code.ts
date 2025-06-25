@@ -236,7 +236,6 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           stats.layers.frames++;
           if (node.layoutMode !== "NONE") stats.layout.autoLayoutFrames++;
           if (node.layoutGrids.length > 0) stats.layout.layoutGrids++;
-          if (!node.description?.trim()) stats.components.missingDescriptions++;
           break;
         case "COMPONENT":
           stats.layers.components++;
