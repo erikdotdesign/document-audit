@@ -18,6 +18,8 @@ export type ColorStats = {
   uniqueFillColors: number;
   uniqueStrokeColors: number;
   colorTokenUsage: number;
+  rawFillUsage: number, // fills without color tokens
+  rawStrokeUsage: number // strokes without color tokens
 };
 
 export type ComponentStats = {
@@ -44,6 +46,8 @@ export type LayoutStats = {
   layoutGrids: number;
   spacingTokensUsed: number;
   irregularSpacing: number;
+  nonIntegerBounds: number; // x, y, width, height not integers
+  rawSpacingUsage: number; // auto layout frames without spacing tokens
 };
 
 export type PerformanceStats = {
@@ -91,6 +95,8 @@ export const auditStats: AuditStats = {
     uniqueFillColors: 0,
     uniqueStrokeColors: 0,
     colorTokenUsage: 0,
+    rawFillUsage: 0,
+    rawStrokeUsage: 0
   },
   components: {
     localComponents: 0,
@@ -114,6 +120,8 @@ export const auditStats: AuditStats = {
     layoutGrids: 0,
     spacingTokensUsed: 0,
     irregularSpacing: 0,
+    nonIntegerBounds: 0,
+    rawSpacingUsage: 0
   },
   performance: {
     largestImageSize: "0 B",
@@ -145,15 +153,16 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   const fonts = new Set<string>();
   const fontSizes = new Set<number>();
   const duplicateNames = new Map<string, number>();
-
   const unusedTextStyleNames: string[] = [];
 
   const stats: AuditStats = {
-    ...auditStats
+    ...auditStats,
+    performance: {
+      ...auditStats.performance,
+      pageCount: pages.length,
+      isHeavy: allNodes.length > 10000,
+    },
   };
-
-  stats.performance.pageCount = pages.length;
-  stats.performance.isHeavy = allNodes.length > 10000;
 
   const getDepth = (node: SceneNode): number => {
     let depth = 0;
@@ -170,7 +179,9 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     const g = Math.round(paint.color.g * 255);
     const b = Math.round(paint.color.b * 255);
     const alpha = paint.opacity !== undefined ? paint.opacity : 1;
-    return `#${[r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")}${alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, "0") : ""}`;
+    return `#${[r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")}${
+      alpha < 1 ? Math.round(alpha * 255).toString(16).padStart(2, "0") : ""
+    }`;
   };
 
   const formatBytes = (bytes: number): string => {
@@ -179,6 +190,10 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     const index = Math.floor(Math.log(bytes) / Math.log(1024));
     const value = bytes / Math.pow(1024, index);
     return `${value.toFixed(1)} ${units[index]}`;
+  };
+
+  const isOffGrid = (value: number): boolean => {
+    return value % 4 !== 0;
   };
 
   for (const node of allNodes) {
@@ -194,11 +209,18 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
       duplicateNames.set(node.name, (duplicateNames.get(node.name) || 0) + 1);
       if (!node.parent || node.parent.type === "PAGE") stats.naming.topLevelUngrouped++;
 
+      // Check non-integer bounds
+      const { x, y, width, height } = node;
+      if ([x, y, width, height].some((n) => !Number.isInteger(n))) {
+        stats.layout.nonIntegerBounds++;
+      }
+
       if ("fills" in node && Array.isArray(node.fills)) {
         for (const fill of node.fills) {
           if (fill.type === "SOLID") {
             fillColors.add(solidPaintToHex(fill));
             if (fill.boundVariables?.color) stats.colors.colorTokenUsage++;
+            else stats.colors.rawFillUsage++;
           } else if (fill.type === "IMAGE") {
             if (!fill.imageHash) stats.layers.brokenImages++;
             else {
@@ -215,18 +237,17 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           if (stroke.type === "SOLID") {
             strokeColors.add(solidPaintToHex(stroke));
             if (stroke.boundVariables?.color) stats.colors.colorTokenUsage++;
+            else stats.colors.rawStrokeUsage++;
           }
         }
       }
 
-      if ("layoutAlign" in node && node.layoutAlign !== "INHERIT") {
-        if (node.x % 2 !== 0) stats.layout.irregularSpacing++;
-      }
-
+      let hasSpacingToken = false;
       if ("boundVariables" in node) {
         for (const key in node.boundVariables) {
           if (key.toLowerCase().includes("spacing") || key.toLowerCase().includes("padding")) {
             stats.layout.spacingTokensUsed++;
+            hasSpacingToken = true;
           }
         }
       }
@@ -234,14 +255,35 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
       switch (node.type) {
         case "FRAME":
           stats.layers.frames++;
-          if (node.layoutMode !== "NONE") stats.layout.autoLayoutFrames++;
+          if (node.layoutMode !== "NONE") {
+            stats.layout.autoLayoutFrames++;
+            if (!hasSpacingToken) stats.layout.rawSpacingUsage++;
+            const paddings = [
+              node.paddingLeft,
+              node.paddingRight,
+              node.paddingTop,
+              node.paddingBottom,
+            ];
+            for (const pad of paddings) {
+              if (isOffGrid(pad)) stats.layout.irregularSpacing++;
+            }
+            // Only check itemSpacing if it's a number (i.e. not "auto")
+            if (typeof node.itemSpacing === "number" && node.primaryAxisAlignItems !== "SPACE_BETWEEN" && isOffGrid(node.itemSpacing)) {
+              stats.layout.irregularSpacing++;
+            }
+            // Check counterAxisSpacing if it exists (Figma doesn’t always expose it)
+            const counterAxisSpacing = (node as any).counterAxisSpacing;
+            if (typeof counterAxisSpacing === "number" && isOffGrid(counterAxisSpacing)) {
+              stats.layout.irregularSpacing++;
+            }
+          }
           if (node.layoutGrids.length > 0) stats.layout.layoutGrids++;
           break;
         case "COMPONENT":
           stats.layers.components++;
           stats.components.localComponents++;
           if (node.parent?.type === "COMPONENT_SET") stats.components.variantSets++;
-          if (!node.description?.trim()) stats.components.missingDescriptions++;
+          if (!node.description) stats.components.missingDescriptions++;
           break;
         case "INSTANCE":
           stats.layers.componentInstances++;
@@ -278,17 +320,19 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   let totalBytes = 0;
   let maxBytes = 0;
 
-  await Promise.allSettled([...imageHashes].map(async (hash) => {
-    try {
-      const image = figma.getImageByHash(hash);
-      if (image) {
-        const bytes = await image.getBytesAsync();
-        const len = bytes.length;
-        totalBytes += len;
-        if (len > maxBytes) maxBytes = len;
-      }
-    } catch {}
-  }));
+  await Promise.allSettled(
+    [...imageHashes].map(async (hash) => {
+      try {
+        const image = figma.getImageByHash(hash);
+        if (image) {
+          const bytes = await image.getBytesAsync();
+          const len = bytes.length;
+          totalBytes += len;
+          if (len > maxBytes) maxBytes = len;
+        }
+      } catch {}
+    })
+  );
 
   stats.performance.largestImageSize = formatBytes(maxBytes);
   stats.performance.approxDocumentSize = formatBytes(totalBytes);
@@ -298,8 +342,11 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
       const mainComponent = await node.getMainComponentAsync();
       if (!mainComponent) stats.components.missingInstances++;
       if (node.overrides?.length) stats.components.overriddenInstances++;
-      if (!mainComponent?.parent || mainComponent.parent.type === "DOCUMENT") stats.components.localComponents++;
-      else stats.components.externalComponents++;
+      if (!mainComponent?.parent || mainComponent.parent.type === "DOCUMENT") {
+        stats.components.localComponents++;
+      } else {
+        stats.components.externalComponents++;
+      }
     } catch {}
   }
 
@@ -322,7 +369,6 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   stats.text.localTextStyles = localTextStyles.size;
   stats.text.remoteTextStyles = remoteTextStyles.size;
   stats.text.unusedTextStyles = unusedTextStyleNames.length;
-
   stats.text.uniqueFonts = fonts.size;
   stats.text.uniqueFontSizes = fontSizes.size;
 

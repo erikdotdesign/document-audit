@@ -107,32 +107,30 @@ const Widget = () => {
         setRoute={setRoute} />
       {
         route === ''
-        ? <>
-            <AutoLayout
-              direction="vertical"
-              height={"fill-parent"}
-              width={'fill-parent'}>
-              {
-                displayStats.map((stat) => (
-                  <DisplayStat
-                    key={stat.label}
-                    highlight={stat.highlight}
-                    label={stat.label}
-                    route={stat.route}
-                    setRoute={setRoute} />
-                ))
-              }
-            </AutoLayout>
-            <Footer 
-              lastAuditKey={lastAuditKey}
-              loading={loading}
-              setLoading={setLoading}
-              setCurrentAuditKey={setCurrentAuditKey} />
-          </>
+        ? <AutoLayout
+            direction="vertical"
+            height={"fill-parent"}
+            width={'fill-parent'}>
+            {
+              displayStats.map((stat) => (
+                <DisplayStat
+                  key={stat.label}
+                  highlight={stat.highlight}
+                  label={stat.label}
+                  route={stat.route}
+                  setRoute={setRoute} />
+              ))
+            }
+          </AutoLayout>
         : <StatDetails 
             stats={stats}
             route={route} />
       }
+      <Footer 
+        lastAuditKey={lastAuditKey}
+        loading={loading}
+        setLoading={setLoading}
+        setCurrentAuditKey={setCurrentAuditKey} />
     </AutoLayout>
   );
 };
