@@ -21,6 +21,7 @@ export type ImageState = {
   broken: number;
   largestSize: string;
   totalSize: string;
+  averageSize: string
 };
 
 export type ColorStats = {
@@ -66,6 +67,7 @@ export type FrameStats = {
 };
 
 export type OrganizationStats = {
+  averageNestingDepth: number;
   maxNestingDepth: number;
   topLevelUngrouped: number;
   duplicateNames: number;
@@ -106,6 +108,7 @@ export const auditStats: AuditStats = {
     broken: 0,
     largestSize: "0 B",
     totalSize: "0 B",
+    averageSize: "0 B"
   },
   colors: {
     uniqueFillColors: 0,
@@ -146,6 +149,7 @@ export const auditStats: AuditStats = {
     nonIntegerBounds: 0,
   },
   organization: {
+    averageNestingDepth: 0,
     maxNestingDepth: 0,
     topLevelUngrouped: 0,
     duplicateNames: 0,
@@ -217,6 +221,9 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
     return value % 4 !== 0;
   };
 
+  let totalDepth = 0;
+  let imageFillCount = 0;
+
   for (const node of allNodes) {
     try {
       stats.layers.total++;
@@ -225,6 +232,7 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
 
       const depth = getDepth(node);
       stats.organization.maxNestingDepth = Math.max(stats.organization.maxNestingDepth, depth);
+      totalDepth += depth;
       duplicateNames.set(node.name, (duplicateNames.get(node.name) || 0) + 1);
 
       if (!node.parent || node.parent.type === "PAGE") stats.organization.topLevelUngrouped++;
@@ -246,6 +254,7 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
               stats.colors.rawFillUsage++;
             }
           } else if (fill.type === "IMAGE") {
+            imageFillCount++;
             if (!fill.imageHash) stats.images.broken++;
             else {
               imageHashes.add(fill.imageHash);
@@ -416,6 +425,8 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
 
   stats.images.largestSize = formatBytes(maxBytes);
   stats.images.totalSize = formatBytes(totalBytes);
+  stats.images.averageSize =
+  imageFillCount > 0 ? formatBytes(totalBytes / imageFillCount) : "0 B";
 
   for (const node of instanceNodes) {
     try {
@@ -467,6 +478,9 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   stats.layers.images = imageHashes.size;
 
   stats.organization.duplicateNames = Array.from(duplicateNames.values()).filter(v => v > 1).length;
+  stats.organization.averageNestingDepth = allNodes.length > 0
+  ? Math.round(totalDepth / allNodes.length)
+  : 0;
 
   return stats;
 };
