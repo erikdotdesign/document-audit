@@ -60,7 +60,6 @@ export type FrameStats = {
 export type OrganizationStats = {
   duplicateNames: number;
   unnamedLayers: number;
-  framelessLayers: number;
   topLevelUngrouped: number;
   maxNestingDepth: number;
   hiddenLayers: number;
@@ -142,7 +141,6 @@ export const auditStats: AuditStats = {
   organization: {
     duplicateNames: 0,
     unnamedLayers: 0,
-    framelessLayers: 0,
     topLevelUngrouped: 0,
     maxNestingDepth: 0,
     hiddenLayers: 0

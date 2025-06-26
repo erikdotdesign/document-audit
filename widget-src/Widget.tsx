@@ -101,7 +101,8 @@ const Widget = () => {
       height={1194}
       fill={style.color.white}
       stroke={style.color.black}
-      strokeWidth={8}>
+      strokeWidth={8}
+      padding={8}>
       <Header 
         route={route}
         setRoute={setRoute} />
