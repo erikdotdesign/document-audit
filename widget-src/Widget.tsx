@@ -65,8 +65,8 @@ const Widget = () => {
   }, [currentAuditKey]); // 🔁 Rerun only if the trigger changes
 
   const displayStats = [{
-    highlight: stats?.layers.totalLayers,
-    label: 'total layers',
+    highlight: stats?.layers.total,
+    label: 'layers',
     route: 'layers'
   },{
     highlight: stats?.colors.uniqueFillColors,
@@ -77,21 +77,21 @@ const Widget = () => {
     label: 'components',
     route: 'components'
   },{
-    highlight: stats?.layers.textLayers,
+    highlight: stats?.layers.text,
     label: 'text layers',
     route: 'text'
   },{
-    highlight: stats?.layout.autoLayoutFrames,
-    label: 'auto layout frames',
-    route: 'layout'
+    highlight: stats?.layers.frames,
+    label: 'frames',
+    route: 'frames'
   },{
-    highlight: stats?.performance.approxDocumentSize,
-    label: 'document size',
-    route: 'performance'
+    highlight: stats?.organization.duplicateNames,
+    label: 'duplicate names',
+    route: 'organization'
   },{
-    highlight: stats?.naming.unnamedLayers,
-    label: 'unnamed layers',
-    route: 'naming'
+    highlight: stats?.layers.images,
+    label: 'images',
+    route: 'images'
   }];
 
   return (
