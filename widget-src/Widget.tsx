@@ -69,17 +69,21 @@ const Widget = () => {
     label: 'layers',
     route: 'layers'
   },{
+    highlight: stats?.layers.images,
+    label: 'images',
+    route: 'images'
+  },{
     highlight: stats?.colors.uniqueFillColors,
     label: 'colors',
     route: 'colors'
   },{
-    highlight: stats?.layers.components,
-    label: 'components',
-    route: 'components'
-  },{
     highlight: stats?.layers.text,
     label: 'text layers',
     route: 'text'
+  },{
+    highlight: stats?.layers.components,
+    label: 'components',
+    route: 'components'
   },{
     highlight: stats?.layers.frames,
     label: 'frames',
@@ -88,10 +92,6 @@ const Widget = () => {
     highlight: stats?.organization.duplicateNames,
     label: 'duplicate names',
     route: 'organization'
-  },{
-    highlight: stats?.layers.images,
-    label: 'images',
-    route: 'images'
   }];
 
   return (

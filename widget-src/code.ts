@@ -4,36 +4,33 @@ export type LayerStats = {
   sections: number;
   groups: number;
   frames: number;
+  components: number;
+  componentSets: number;
+  componentInstances: number;
+  text: number;
   shapes: number;
   booleanShapes: number;
   vectors: number;
   slices: number;
-  components: number;
-  componentInstances: number;
-  componentSets: number;
-  text: number;
   images: number;
+};
+
+export type ImageState = {
+  embedded: number;
+  linked: number;
+  broken: number;
+  largestSize: string;
+  totalSize: string;
 };
 
 export type ColorStats = {
   uniqueFillColors: number;
   uniqueStrokeColors: number;
-  rawFillUsage: number; // fills without color tokens
-  rawStrokeUsage: number; // strokes without color tokens
+  rawFillUsage: number;
+  rawStrokeUsage: number;
+  colorTokenUsage: number;
   uniqueColorTokens: number;
   unusedColorTokens: number;
-  colorTokenUsage: number;
-};
-
-export type ComponentStats = {
-  local: number;
-  remote: number;
-  localInstances: number;
-  remoteInstances: number;
-  variants: number;
-  missingInstances: number;
-  overriddenInstances: number;
-  missingDescriptions: number;
 };
 
 export type TextStats = {
@@ -47,40 +44,43 @@ export type TextStats = {
   unusedTextStyles: number;
 };
 
+export type ComponentStats = {
+  local: number;
+  remote: number;
+  variants: number;
+  localInstances: number;
+  remoteInstances: number;
+  overriddenInstances: number;
+  missingInstances: number;
+  missingDescriptions: number;
+};
+
 export type FrameStats = {
   autoLayouts: number;
+  spacingTokenUsage: number;
+  rawSpacingUsage: number;
   uniqueSpacingTokens: number;
   unusedSpacingTokens: number;
-  spacingTokenUsage: number;
   irregularSpacing: number;
-  nonIntegerBounds: number; // x, y, width, height not integers
-  rawSpacingUsage: number; // auto layout frames without spacing tokens
+  nonIntegerBounds: number;
 };
 
 export type OrganizationStats = {
+  maxNestingDepth: number;
+  topLevelUngrouped: number;
   duplicateNames: number;
   unnamedLayers: number;
-  topLevelUngrouped: number;
-  maxNestingDepth: number;
   hiddenLayers: number;
-};
-
-export type ImageState = {
-  embedded: number;
-  linked: number;
-  broken: number;
-  largestSize: string;
-  totalSize: string;
 };
 
 export type AuditStats = {
   layers: LayerStats;
+  images: ImageState;
   colors: ColorStats;
-  components: ComponentStats;
   text: TextStats;
+  components: ComponentStats;
   frames: FrameStats;
   organization: OrganizationStats;
-  images: ImageState;
 };
 
 export const auditStats: AuditStats = {
@@ -90,34 +90,31 @@ export const auditStats: AuditStats = {
     sections: 0,
     groups: 0,
     frames: 0,
+    components: 0,
+    componentSets: 0,
+    componentInstances: 0,
+    text: 0,
     shapes: 0,
     booleanShapes: 0,
     vectors: 0,
     slices: 0,
-    components: 0,
-    componentInstances: 0,
-    componentSets: 0,
-    text: 0,
-    images: 0
+    images: 0,
+  },
+  images: {
+    embedded: 0,
+    linked: 0,
+    broken: 0,
+    largestSize: "0 B",
+    totalSize: "0 B",
   },
   colors: {
     uniqueFillColors: 0,
     uniqueStrokeColors: 0,
     rawFillUsage: 0,
     rawStrokeUsage: 0,
+    colorTokenUsage: 0,
     uniqueColorTokens: 0,
     unusedColorTokens: 0,
-    colorTokenUsage: 0
-  },
-  components: {
-    local: 0,
-    remote: 0,
-    localInstances: 0,
-    remoteInstances: 0,
-    variants: 0,
-    missingInstances: 0,
-    overriddenInstances: 0,
-    missingDescriptions: 0,
   },
   text: {
     fontFamilies: 0,
@@ -129,28 +126,31 @@ export const auditStats: AuditStats = {
     remoteTextStyles: 0,
     unusedTextStyles: 0,
   },
+  components: {
+    local: 0,
+    remote: 0,
+    variants: 0,
+    localInstances: 0,
+    remoteInstances: 0,
+    overriddenInstances: 0,
+    missingInstances: 0,
+    missingDescriptions: 0,
+  },
   frames: {
     autoLayouts: 0,
+    spacingTokenUsage: 0,
+    rawSpacingUsage: 0,
     uniqueSpacingTokens: 0,
     unusedSpacingTokens: 0,
-    spacingTokenUsage: 0,
     irregularSpacing: 0,
     nonIntegerBounds: 0,
-    rawSpacingUsage: 0
   },
   organization: {
+    maxNestingDepth: 0,
+    topLevelUngrouped: 0,
     duplicateNames: 0,
     unnamedLayers: 0,
-    topLevelUngrouped: 0,
-    maxNestingDepth: 0,
-    hiddenLayers: 0
-  },
-  images: {
-    embedded: 0,
-    linked: 0,
-    broken: 0,
-    largestSize: "0 B",
-    totalSize: "0 B"
+    hiddenLayers: 0,
   }
 };
 
