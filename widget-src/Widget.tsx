@@ -73,7 +73,7 @@ const Widget = () => {
     label: 'images',
     route: 'images'
   },{
-    highlight: stats?.colors.uniqueFillColors,
+    highlight: stats?.colors.uniqueFillColors + stats?.colors.uniqueStrokeColors,
     label: 'colors',
     route: 'colors'
   },{
