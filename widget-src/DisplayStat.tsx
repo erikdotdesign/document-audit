@@ -1,4 +1,5 @@
 import style from './style';
+import { formatNumber } from './StatDetails';
 
 const { widget } = figma;
 const { AutoLayout, Text, Span } = widget;
@@ -19,6 +20,8 @@ const DisplayStat = ({ highlight = 0, label, route, setRoute }: DisplayStatProps
   return (
     <AutoLayout
       width={'fill-parent'}
+      height={'fill-parent'}
+      verticalAlignItems={'center'}
       fill={style.color.white}
       padding={{
         left: style.spacing.large,
@@ -31,12 +34,11 @@ const DisplayStat = ({ highlight = 0, label, route, setRoute }: DisplayStatProps
       <Text 
         fontFamily={style.fontFamily}
         fontSize={style.fontSize.large}
-        lineHeight={style.lineHeight.large}
         fontWeight={style.fontWeight.bold}>
         <Span 
           fill={style.color.black}
           fontWeight={style.fontWeight.black}>
-          {highlight}
+          {formatNumber(highlight)}
         </Span>
           {` `}
         <Span fill={style.color.gray}>

@@ -9,6 +9,14 @@ interface StatDetailsProps {
   route: string;
 }
 
+export const formatNumber = (n: number | string): string => {
+  if (typeof n === 'number') {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  } else {
+    return n;
+  }
+}
+
 const StatDetails = ({ stats, route }: StatDetailsProps) => {
 
   const formatKey = (key) => {
@@ -22,8 +30,8 @@ const StatDetails = ({ stats, route }: StatDetailsProps) => {
       width={'fill-parent'}
       height={'fill-parent'}
       padding={{
-        left: style.spacing.large,
-        right: style.spacing.large
+        left: style.spacing.medium,
+        right: style.spacing.medium
       }}>
       {
         Object.keys(stats[route]).map((key, index) => (
@@ -46,7 +54,7 @@ const StatDetails = ({ stats, route }: StatDetailsProps) => {
               fontSize={style.fontSize.shmedium}
               lineHeight={style.lineHeight.shmedium}
               fontWeight={style.fontWeight.bold}>
-              { `${stats[route][key]}` }
+              { formatNumber(stats[route][key]) }
             </Text>
           </AutoLayout>
         ))
