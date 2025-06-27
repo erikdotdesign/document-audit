@@ -22,7 +22,7 @@ const style = {
     small: 24,
     shmedium: 32,
     medium: 40,
-    large: 128
+    large: 120
   },
   fontWeight: {
     normal: 400,

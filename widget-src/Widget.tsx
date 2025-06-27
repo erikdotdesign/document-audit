@@ -66,28 +66,32 @@ const Widget = () => {
 
   const displayStats = [{
     highlight: stats?.layers.total,
-    label: 'layers',
+    label: 'total layers',
     route: 'layers'
   },{
-    highlight: stats?.layers.images,
-    label: 'images',
-    route: 'images'
+    highlight: stats?.layout.autoLayouts,
+    label: 'auto layouts',
+    route: 'layout'
   },{
-    highlight: stats?.colors.uniqueFillColors + stats?.colors.uniqueStrokeColors,
-    label: 'colors',
+    highlight: stats?.text.uniqueTextStyles,
+    label: 'text styles',
+    route: 'text'
+  },{
+    highlight: stats?.colors.uniqueColorTokens,
+    label: 'color tokens',
     route: 'colors'
   },{
-    highlight: stats?.layers.text,
-    label: 'text layers',
-    route: 'text'
+    highlight: stats?.effects.uniqueEffectStyles,
+    label: 'effect styles',
+    route: 'effects'
   },{
     highlight: stats?.layers.components,
     label: 'components',
     route: 'components'
   },{
-    highlight: stats?.layers.frames,
-    label: 'frames',
-    route: 'frames'
+    highlight: stats?.layers.images,
+    label: 'images',
+    route: 'images'
   },{
     highlight: stats?.organization.duplicateNames,
     label: 'duplicate names',
