@@ -81,6 +81,10 @@ const Widget = () => {
     label: 'color tokens',
     route: 'colors'
   },{
+    highlight: stats?.appearance.uniqueCornerRadiusTokens,
+    label: 'corner tokens',
+    route: 'appearance'
+  },{
     highlight: stats?.effects.uniqueEffectStyles,
     label: 'effect styles',
     route: 'effects'

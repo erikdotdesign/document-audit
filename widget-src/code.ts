@@ -34,6 +34,19 @@ export type ColorStats = {
   uniqueColorTokens: number;
 };
 
+export type AppearanceStats = {
+  localVariableCollections: number;
+  remoteVariableCollections: number;
+  localVariableModes: number;
+  remoteVariableModes: number;
+  cornerRadiusTokenUsage: number;
+  rawCornerRadiusUsage: number;
+  uniqueCornerRadiusTokens: number;
+  strokeWeightTokenUsage: number;
+  rawStrokeWeightUsage: number;
+  uniqueStrokeWeightTokens: number;
+};
+
 export type EffectStats = {
   rawEffectUsage: number;
   rawPropertyUsage: number;
@@ -78,12 +91,6 @@ export type LayoutStats = {
   uniqueSpacingTokens: number;
   irregularSpacing: number;
   nonIntegerBounds: number;
-  strokeWeightTokenUsage: number;
-  rawStrokeWeightUsage: number;
-  uniqueStrokeWeightTokens: number;
-  cornerRadiusTokenUsage: number;
-  rawCornerRadiusUsage: number;
-  uniqueCornerRadiusTokens: number;
 };
 
 export type OrganizationStats = {
@@ -101,6 +108,7 @@ export type AuditStats = {
   layout: LayoutStats;
   text: TextStats;
   colors: ColorStats;
+  appearance: AppearanceStats;
   effects: EffectStats;
   components: ComponentStats;
   images: ImageState;
@@ -133,13 +141,7 @@ export const auditStats: AuditStats = {
     rawSpacingUsage: 0,
     uniqueSpacingTokens: 0,
     irregularSpacing: 0,
-    nonIntegerBounds: 0,
-    strokeWeightTokenUsage: 0,
-    rawStrokeWeightUsage: 0,
-    uniqueStrokeWeightTokens: 0,
-    cornerRadiusTokenUsage: 0,
-    rawCornerRadiusUsage: 0,
-    uniqueCornerRadiusTokens: 0,
+    nonIntegerBounds: 0
   },
   text: {
     fontFamilies: 0,
@@ -150,6 +152,18 @@ export const auditStats: AuditStats = {
     localTextStyles: 0,
     remoteTextStyles: 0,
     unusedLocalTextStyles: 0,
+  },
+  appearance: {
+    localVariableCollections: 0,
+    remoteVariableCollections: 0,
+    localVariableModes: 0,
+    remoteVariableModes: 0,
+    cornerRadiusTokenUsage: 0,
+    rawCornerRadiusUsage: 0,
+    uniqueCornerRadiusTokens: 0,
+    strokeWeightTokenUsage: 0,
+    rawStrokeWeightUsage: 0,
+    uniqueStrokeWeightTokens: 0
   },
   colors: {
     rawFillColorUsage: 0,
@@ -293,10 +307,10 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           const variable = node.boundVariables?.[key as keyof typeof node.boundVariables];
           if (variable) {
             uniqueStrokeWeightTokens.add(variable.id);
-            stats.layout.strokeWeightTokenUsage++;
+            stats.appearance.strokeWeightTokenUsage++;
           } else {
             if (node[key]) {
-              stats.layout.rawStrokeWeightUsage++;
+              stats.appearance.rawStrokeWeightUsage++;
             }
           }
         }
@@ -309,10 +323,10 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
           const variable = node.boundVariables?.[key as keyof typeof node.boundVariables];
           if (variable) {
             uniqueCornerRadiusTokens.add(variable.id);
-            stats.layout.cornerRadiusTokenUsage++;
+            stats.appearance.cornerRadiusTokenUsage++;
           } else {
             if (node[key]) {
-              stats.layout.rawCornerRadiusUsage++;
+              stats.appearance.rawCornerRadiusUsage++;
             }
           }
         }
@@ -586,6 +600,9 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   ...uniqueStrokeColorTokens,
 ]).size;
 
+  stats.appearance.uniqueStrokeWeightTokens = uniqueStrokeWeightTokens.size;
+  stats.appearance.uniqueCornerRadiusTokens = uniqueCornerRadiusTokens.size;
+
   stats.effects.uniquePropertyTokens = uniqueEffectPropertyTokens.size;
   stats.effects.uniqueEffectStyles = uniqueEffectStyles.size;
   stats.effects.localEffectStyles = localEffectStyles.size;
@@ -594,8 +611,6 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
 
   stats.layout.uniqueSpacingTokens = uniqueSpacingTokens.size;
   stats.layout.uniquePaddingTokens = uniquePaddingTokens.size;
-  stats.layout.uniqueStrokeWeightTokens = uniqueStrokeWeightTokens.size;
-  stats.layout.uniqueCornerRadiusTokens = uniqueCornerRadiusTokens.size;
 
   stats.components.remote = remoteComponents.size;
 
@@ -603,6 +618,32 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
   stats.organization.averageNestingDepth = allNodes.length > 0
   ? Math.round(totalDepth / allNodes.length)
   : 0;
+
+  try {
+    const collections = await figma.variables.getLocalVariableCollectionsAsync();
+    const remoteCollections = collections.filter(c => c.remote);
+    const localCollections = collections.filter(c => !c.remote);
+
+    const localVariableModes = new Set<string>();
+    for (const collection of localCollections) {
+      for (const mode of collection.modes) {
+        localVariableModes.add(mode.modeId);
+      }
+    }
+    const remoteVariableModes = new Set<string>();
+    for (const collection of remoteCollections) {
+      for (const mode of collection.modes) {
+        remoteVariableModes.add(mode.modeId);
+      }
+    }
+
+    stats.appearance.localVariableCollections = localCollections.length;
+    stats.appearance.remoteVariableCollections = remoteCollections.length;
+    stats.appearance.localVariableModes = localVariableModes.size;
+    stats.appearance.remoteVariableModes = remoteVariableModes.size;
+  } catch (err) {
+    console.warn("Failed to audit variables:", err);
+  }
 
   return stats;
 };
