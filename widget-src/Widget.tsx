@@ -73,6 +73,10 @@ const Widget = () => {
     label: 'auto layouts',
     route: 'layout'
   },{
+    highlight: stats?.appearance.uniqueCornerRadiusTokens,
+    label: 'corner tokens',
+    route: 'appearance'
+  },{
     highlight: stats?.text.uniqueTextStyles,
     label: 'text styles',
     route: 'text'
@@ -80,10 +84,6 @@ const Widget = () => {
     highlight: stats?.colors.uniqueColorTokens,
     label: 'color tokens',
     route: 'colors'
-  },{
-    highlight: stats?.appearance.uniqueCornerRadiusTokens,
-    label: 'corner tokens',
-    route: 'appearance'
   },{
     highlight: stats?.effects.uniqueEffectStyles,
     label: 'effect styles',
