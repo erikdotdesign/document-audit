@@ -81,6 +81,7 @@ export const Widget = () => {
         width={"fill-parent"}>
         <Router 
           route={route}
+          stats={stats}
           setRoute={setRoute}
           setBreadcrumbs={setBreadcrumbs} />
       </AutoLayout>
