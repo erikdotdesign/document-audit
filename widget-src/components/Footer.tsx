@@ -1,4 +1,4 @@
-import style from './style';
+import style from '../style';
 import AuditButton from './AuditButton';
 
 const { widget } = figma;

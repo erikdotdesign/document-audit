@@ -1,25 +1,22 @@
 import { AuditStyleStats, buildAuditStyleStats } from './audit/buildStats';
 import { auditFigmaDocument } from './audit/processNodes';
+import { Route, Breadcrumb } from './routes';
+import Header from './components/Header';
+import Router from './components/Router';
+import Footer from './components/Footer';
 import style from './style';
-import DisplayStat from './DisplayStat';
-import Header from './Header';
-import Footer from './Footer';
-import StatDetails from './StatDetails';
 
 const { widget } = figma;
-const {
-  useSyncedState,
-  AutoLayout,
-  useEffect,
-  waitForTask,
-} = widget;
+const { useSyncedState, AutoLayout, waitForTask, useEffect } = widget;
 
-const Widget = () => {
+export const Widget = () => {
+  const defaultRoute: Route = { type: "home" };
   const [stats, setStats] = useSyncedState<AuditStyleStats>('stats', buildAuditStyleStats());
   const [lastAuditKey, setLastAuditKey] = useSyncedState<number>('lastAuditKey', 0);
   const [currentAuditKey, setCurrentAuditKey] = useSyncedState<number>('currentAuditKey', Date.now());
   const [loading, setLoading] = useSyncedState<boolean>('loading', true);
-  const [route, setRoute] = useSyncedState<string>('route', '');
+  const [route, setRoute] = useSyncedState<Route>("route", defaultRoute);
+  const [breadcrumbs, setBreadcrumbs] = useSyncedState<Breadcrumb[]>("breadcrumbs", [{ route: defaultRoute, label: "Document Audit" }]);
 
   // 🔁 Fully recursive hydration
   const hydrateNode = (node: SceneNode) => {
@@ -66,7 +63,7 @@ const Widget = () => {
   }, [currentAuditKey]); // 🔁 Rerun only if the trigger changes
 
   return (
-    <AutoLayout
+    <AutoLayout 
       direction="vertical"
       width={834}
       height={1194}
@@ -75,27 +72,18 @@ const Widget = () => {
       strokeWidth={8}
       padding={style.spacing.small}>
       <Header 
-        route={route}
-        setRoute={setRoute} />
-      {
-        route === ''
-        ? <AutoLayout
-            direction="vertical"
-            height={"fill-parent"}
-            width={'fill-parent'}>
-            {
-              displayStats.map((stat) => (
-                <DisplayStat
-                  key={stat.label}
-                  highlight={stat.highlight}
-                  label={stat.label}
-                  route={stat.route}
-                  setRoute={setRoute} />
-              ))
-            }
-          </AutoLayout>
-        : null
-      }
+        breadcrumbs={breadcrumbs}
+        setRoute={setRoute}
+        setBreadcrumbs={setBreadcrumbs} />
+      <AutoLayout
+        direction="vertical"
+        height={"fill-parent"}
+        width={"fill-parent"}>
+        <Router 
+          route={route}
+          setRoute={setRoute}
+          setBreadcrumbs={setBreadcrumbs} />
+      </AutoLayout>
       <Footer 
         lastAuditKey={lastAuditKey}
         loading={loading}

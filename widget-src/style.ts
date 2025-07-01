@@ -8,21 +8,28 @@ const style = {
   spacing: {
     small: 8,
     shmedium: 12,
-    medium: 16,
+    medium: 24,
+    large: 32
+  },
+  padding: {
+    small: 8,
+    shmedium: 16,
+    medium: 24,
     large: 32
   },
   fontFamily: 'Inter',
   fontSize: {
-    small: 16,
-    shmedium: 24,
-    medium: 32,
-    large: 56
+    small: 12,
+    shmedium: 16,
+    medium: 24,
+    large: 32,
+    display: 56
   },
   lineHeight: {
     small: 24,
     shmedium: 32,
     medium: 40,
-    large: 120
+    large: 56
   },
   fontWeight: {
     normal: 400,

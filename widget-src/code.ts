@@ -1,4 +1,4 @@
-import { proccessNode } from "./codeNew";
+// import { proccessNode } from "./processFills";
 
 export type LayerStats = {
   total: number;
@@ -282,7 +282,7 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]): Promise<AuditSt
 
   for (const node of allNodes) {
     try {
-      proccessNode(node);
+      // proccessNode(node);
       // stats.layers.total++;
       // if (!node.visible) stats.organization.hiddenLayers++;
       // if (!node.name) stats.organization.unnamedLayers++;

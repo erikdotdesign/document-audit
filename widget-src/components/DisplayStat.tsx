@@ -1,4 +1,4 @@
-import style from './style';
+import style from '../style';
 import { formatNumber } from './StatDetails';
 
 const { widget } = figma;
