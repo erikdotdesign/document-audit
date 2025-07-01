@@ -3,7 +3,9 @@ const style = {
     white: "#f2f2f2",
     black: "#333333",
     gray: "#797979",
-    lightGray: "#e5e5e5"
+    z1: "#e5e5e5",
+    z2: "#d7d7d7",
+    z3: "#c8c8c8"
   },
   spacing: {
     small: 8,
@@ -13,8 +15,8 @@ const style = {
   },
   padding: {
     small: 8,
-    shmedium: 16,
-    medium: 24,
+    shmedium: 12,
+    medium: 16,
     large: 32
   },
   fontFamily: 'Inter',
@@ -27,9 +29,10 @@ const style = {
   },
   lineHeight: {
     small: 24,
-    shmedium: 32,
+    shmedium: 24,
     medium: 40,
-    large: 56
+    large: 56,
+    display: 88
   },
   fontWeight: {
     normal: 400,

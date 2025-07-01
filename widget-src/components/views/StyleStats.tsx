@@ -1,12 +1,72 @@
+import { Route, Breadcrumb, StyleOriginRouteType, StyleRouteType, navigate } from '../../routes';
+import style from "../../style";
+import { camelCaseToTitleCase, camelCaseToSentence, typedKeys } from "../../helpers";
+import { AuditStyleStats } from "../../audit/buildStats";
+
 const { widget } = figma;
 const { AutoLayout, Text } = widget;
 
-const StyleStats = ({ style, onOriginClick }) => (
-  <AutoLayout direction="vertical" spacing={4}>
-    <Text>Viewing: {style}</Text>
-    <Text onClick={() => onOriginClick("local")}>Local</Text>
-    <Text onClick={() => onOriginClick("remote")}>Remote</Text>
-  </AutoLayout>
-);
+interface StyleStatsProps {
+  routeStyle: StyleRouteType;
+  stats: AuditStyleStats;
+  setRoute: (route: Route) => void;
+  setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
+};
+
+const StyleStats = ({ routeStyle, stats, setRoute, setBreadcrumbs }: StyleStatsProps) => {
+
+  const handleNavigate = (origin: StyleOriginRouteType) => {
+    navigate(
+      { type: "styleOrigin", style: routeStyle, origin }, 
+      `${camelCaseToTitleCase(origin)} ${camelCaseToTitleCase(routeStyle)}`, 
+      setRoute, setBreadcrumbs
+    );
+  };
+
+  return (
+    <AutoLayout
+      direction={'vertical'}
+      width={'fill-parent'}
+      height={'fill-parent'}
+      padding={{
+        left: style.padding.medium,
+        right: style.padding.medium
+      }}>
+      {
+        typedKeys(stats[routeStyle]).map((key) => (
+          <AutoLayout 
+            key={key}
+            width={'fill-parent'}
+            spacing={'auto'}
+            padding={{
+              vertical: style.padding.shmedium,
+              horizontal: style.padding.medium
+            }}
+            fill={style.color.white}
+            hoverStyle={{
+              fill: style.color.z1
+            }}
+            cornerRadius={style.cornerRadius}
+            onClick={() => handleNavigate(key)}>
+            <Text
+              fontFamily={style.fontFamily}
+              fontSize={style.fontSize.shmedium}
+              lineHeight={style.lineHeight.shmedium}
+              fontWeight={style.fontWeight.bold}>
+              { camelCaseToSentence(key) }
+            </Text>
+            <Text
+              fontFamily={style.fontFamily}
+              fontSize={style.fontSize.shmedium}
+              lineHeight={style.lineHeight.shmedium}
+              fontWeight={style.fontWeight.bold}>
+              →
+            </Text>
+          </AutoLayout>
+        ))
+      }
+    </AutoLayout>
+  );
+};
 
 export default StyleStats;

@@ -1,3 +1,4 @@
+import { formatDate } from '../helpers';
 import style from '../style';
 import AuditButton from './AuditButton';
 
@@ -12,24 +13,6 @@ interface FooterProps {
 }
 
 const Footer = ({ lastAuditKey, loading, setLoading, setCurrentAuditKey }: FooterProps) => {
-
-  const formatDate = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const year = date.getFullYear();
-
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    if (hours === 0) hours = 12;
-
-    return `${month}/${day}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
-  }
-
   return (
     <AutoLayout 
       verticalAlignItems='center'
@@ -39,16 +22,16 @@ const Footer = ({ lastAuditKey, loading, setLoading, setCurrentAuditKey }: Foote
       <AutoLayout direction='vertical'>
         <Text 
           fontFamily={style.fontFamily}
-          fontSize={style.fontSize.small}
-          lineHeight={style.lineHeight.small}
+          fontSize={style.fontSize.shmedium}
+          lineHeight={style.lineHeight.shmedium}
           fontWeight={style.fontWeight.bold}
           fill={style.color.black}>
           Last audit
         </Text>
         <Text 
           fontFamily={style.fontFamily}
-          fontSize={style.fontSize.small}
-          lineHeight={style.lineHeight.small}
+          fontSize={style.fontSize.shmedium}
+          lineHeight={style.lineHeight.shmedium}
           fontWeight={style.fontWeight.normal}
           fill={style.color.black}>
           {formatDate(lastAuditKey)}

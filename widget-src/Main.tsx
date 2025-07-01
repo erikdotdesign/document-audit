@@ -18,7 +18,7 @@ export const Widget = () => {
   const [route, setRoute] = useSyncedState<Route>("route", defaultRoute);
   const [breadcrumbs, setBreadcrumbs] = useSyncedState<Breadcrumb[]>("breadcrumbs", [{ route: defaultRoute, label: "Document Audit" }]);
 
-  // 🔁 Fully recursive hydration
+  // Fully recursive hydration
   const hydrateNode = (node: SceneNode) => {
     void node.type;
     void node.name;
@@ -44,7 +44,7 @@ export const Widget = () => {
     }
     
     figma.notify('Auditing 🔎', { timeout: Infinity });
-    await new Promise((res) => setTimeout(res, 0)); // defer until Figma's graph is ready
+    await new Promise((res) => setTimeout(res, 0)); // allow widget to be painted
     console.log("⏳ Starting scene graph hydration...");
     await hydrateSceneGraph();
 
@@ -60,7 +60,7 @@ export const Widget = () => {
 
   useEffect(() => {
     waitForTask(runAuditOnce().catch(console.error));
-  }, [currentAuditKey]); // 🔁 Rerun only if the trigger changes
+  }, [currentAuditKey]);
 
   return (
     <AutoLayout 
@@ -70,21 +70,16 @@ export const Widget = () => {
       fill={style.color.white}
       stroke={style.color.black}
       strokeWidth={8}
-      padding={style.spacing.small}>
+      padding={style.padding.small}>
       <Header 
         breadcrumbs={breadcrumbs}
         setRoute={setRoute}
         setBreadcrumbs={setBreadcrumbs} />
-      <AutoLayout
-        direction="vertical"
-        height={"fill-parent"}
-        width={"fill-parent"}>
-        <Router 
-          route={route}
-          stats={stats}
-          setRoute={setRoute}
-          setBreadcrumbs={setBreadcrumbs} />
-      </AutoLayout>
+      <Router 
+        route={route}
+        stats={stats}
+        setRoute={setRoute}
+        setBreadcrumbs={setBreadcrumbs} />
       <Footer 
         lastAuditKey={lastAuditKey}
         loading={loading}

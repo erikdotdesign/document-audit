@@ -18,13 +18,14 @@ const Breadcrumbs = ({ breadcrumbs, setRoute, setBreadcrumbs }: BreadcrumbsProps
 
   return (
     <AutoLayout 
-      direction="horizontal" 
+      direction="horizontal"
       spacing={style.spacing.small}>
       {
         breadcrumbs.map((crumb, i) => (
-          <>
+          <AutoLayout
+            key={crumb.label}
+            spacing={style.spacing.small}>
             <Text
-              key={i}
               onClick={() => handleNavigate(i)}
               fill={style.color.gray}
               fontFamily={style.fontFamily}
@@ -45,7 +46,7 @@ const Breadcrumbs = ({ breadcrumbs, setRoute, setBreadcrumbs }: BreadcrumbsProps
                 </Text>
               : null
             }
-          </>
+          </AutoLayout>
         ))
       }
     </AutoLayout>

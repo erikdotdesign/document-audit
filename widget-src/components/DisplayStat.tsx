@@ -28,7 +28,7 @@ const DisplayStat = ({ highlight = 0, label, route, setRoute }: DisplayStatProps
         right: style.spacing.large
       }}
       hoverStyle={{
-        fill: style.color.lightGray
+        fill: style.color.z1
       }}
       onClick={handleClick}>
       <Text 
