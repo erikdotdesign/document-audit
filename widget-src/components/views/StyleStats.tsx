@@ -2,6 +2,7 @@ import { Route, Breadcrumb, StyleOriginRouteType, StyleRouteType, navigate } fro
 import style from "../../style";
 import { camelCaseToTitleCase, camelCaseToSentence, typedKeys } from "../../helpers";
 import { AuditStyleStats } from "../../audit/buildStats";
+import PieChart from '../PieChart';
 
 const { widget } = figma;
 const { AutoLayout, Text } = widget;
@@ -25,46 +26,54 @@ const StyleStats = ({ routeStyle, stats, setRoute, setBreadcrumbs }: StyleStatsP
 
   return (
     <AutoLayout
-      direction={'vertical'}
-      width={'fill-parent'}
-      height={'fill-parent'}
+      direction="vertical"
+      width="fill-parent"
+      height="fill-parent"
       padding={{
         left: style.padding.medium,
         right: style.padding.medium
-      }}>
-      {
-        typedKeys(stats[routeStyle]).map((key) => (
-          <AutoLayout 
-            key={key}
-            width={'fill-parent'}
-            spacing={'auto'}
-            padding={{
-              vertical: style.padding.shmedium,
-              horizontal: style.padding.medium
-            }}
-            fill={style.color.white}
-            hoverStyle={{
-              fill: style.color.z1
-            }}
-            cornerRadius={style.cornerRadius}
-            onClick={() => handleNavigate(key)}>
-            <Text
-              fontFamily={style.fontFamily}
-              fontSize={style.fontSize.shmedium}
-              lineHeight={style.lineHeight.shmedium}
-              fontWeight={style.fontWeight.bold}>
-              { camelCaseToSentence(key) }
-            </Text>
-            <Text
-              fontFamily={style.fontFamily}
-              fontSize={style.fontSize.shmedium}
-              lineHeight={style.lineHeight.shmedium}
-              fontWeight={style.fontWeight.bold}>
-              →
-            </Text>
-          </AutoLayout>
-        ))
-      }
+      }}
+      spacing={style.spacing.medium}>
+      <PieChart
+        stats={stats}
+        routeStyle={routeStyle} />
+      <AutoLayout
+        direction="vertical"
+        width="fill-parent">
+        {
+          typedKeys(stats[routeStyle]).map((key) => (
+            <AutoLayout 
+              key={key}
+              width={'fill-parent'}
+              spacing={'auto'}
+              padding={{
+                vertical: style.padding.shmedium,
+                horizontal: style.padding.medium
+              }}
+              fill={style.color.white}
+              hoverStyle={{
+                fill: style.color.z1
+              }}
+              cornerRadius={style.cornerRadius}
+              onClick={() => handleNavigate(key)}>
+              <Text
+                fontFamily={style.fontFamily}
+                fontSize={style.fontSize.shmedium}
+                lineHeight={style.lineHeight.shmedium}
+                fontWeight={style.fontWeight.bold}>
+                { camelCaseToSentence(key) }
+              </Text>
+              <Text
+                fontFamily={style.fontFamily}
+                fontSize={style.fontSize.shmedium}
+                lineHeight={style.lineHeight.shmedium}
+                fontWeight={style.fontWeight.bold}>
+                { stats[routeStyle][key].count } →
+              </Text>
+            </AutoLayout>
+          ))
+        }
+      </AutoLayout>
     </AutoLayout>
   );
 };

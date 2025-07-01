@@ -3,6 +3,8 @@ const style = {
     white: "#f2f2f2",
     black: "#333333",
     gray: "#797979",
+    blue: "#478CD1",
+    darkBlue: "#24598F",
     z1: "#e5e5e5",
     z2: "#d7d7d7",
     z3: "#c8c8c8"

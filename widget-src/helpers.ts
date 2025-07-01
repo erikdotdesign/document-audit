@@ -48,3 +48,23 @@ export const formatDate = (timestamp: number): string => {
 export const tallyObjectValues = (obj: object) => {
   return Object.values(obj).reduce((sum, value) => sum + value, 0);
 };
+
+export const hexToRGBA = (hex: string, alpha = 1): RGBA => {
+  // Remove leading #
+  hex = hex.replace(/^#/, '');
+
+  // Expand 3-digit hex to 6-digit
+  if (hex.length === 3) {
+    hex = hex.split('').map(c => c + c).join('');
+  }
+
+  if (hex.length !== 6) {
+    throw new Error(`Invalid hex color: ${hex}`);
+  }
+
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+  return { r, g, b, a: alpha };
+}
