@@ -15,11 +15,11 @@
     "@figma/eslint-plugin-figma-plugins": "*",
     "@figma/plugin-typings": "*",
     "@figma/widget-typings": "*",
+    "@types/react": "^19.1.8",
     "@typescript-eslint/eslint-plugin": "^6.12.0",
     "@typescript-eslint/parser": "^6.12.0",
     "esbuild": "*",
     "eslint": "^8.54.0",
-    "react": "^19.1.0",
     "typescript": "^5.3.2"
   },
   "eslintConfig": {
