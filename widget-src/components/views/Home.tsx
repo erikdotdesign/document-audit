@@ -19,7 +19,9 @@ const Home = ({ stats, setRoute, setBreadcrumbs }: HomeProps) => {
   };
 
   const getHighlightCount = (style: StyleRouteType) => {
-    return formatNumber(tallyValue(stats[style].local.count) + tallyValue(stats[style].remote.count));
+    const localValues = stats[style].local ? tallyValue(stats[style].local.count) : 0;
+    const remoteValues = stats[style].remote ? tallyValue(stats[style].remote.count) : 0;
+    return formatNumber(localValues + remoteValues);
   };
 
   return (

@@ -274,12 +274,12 @@ export const buildFrameStats = () => ({
 
 export type OriginFrameStats = {
   local: FrameStats;
-  remote: FrameStats;
+  // remote: FrameStats;
 };
 
 export const buildOriginFrameStats = (): OriginFrameStats => ({
   local: buildFrameStats(),
-  remote: buildFrameStats()
+  // remote: buildFrameStats()
 });
 
 export type AuditStyleStats = {
