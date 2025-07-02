@@ -1,3 +1,5 @@
+import React from "react";
+
 export type StyleRouteType = "colorStyles" | "textStyles" | "effectStyles" | "gridStyles";
 export type StyleOriginRouteType = "local" | "remote";
 

@@ -1,6 +1,6 @@
 import { Route, Breadcrumb, StyleRouteType, navigate } from '../../routes';
 import style from "../../style";
-import { formatNumber, camelCaseToTitleCase, camelCaseToSentenceLower, typedKeys } from "../../helpers";
+import { formatNumber, camelCaseToTitleCase, camelCaseToSentenceLower, typedKeys, tallyValue } from "../../helpers";
 import { AuditStyleStats } from "../../audit/buildStats";
 
 const { widget } = figma;
@@ -10,7 +10,7 @@ interface HomeProps {
   stats: AuditStyleStats;
   setRoute: (route: Route) => void;
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
-};
+}
 
 const Home = ({ stats, setRoute, setBreadcrumbs }: HomeProps) => {
 
@@ -19,7 +19,7 @@ const Home = ({ stats, setRoute, setBreadcrumbs }: HomeProps) => {
   };
 
   const getHighlightCount = (style: StyleRouteType) => {
-    return formatNumber(stats[style].local.count + stats[style].remote.count);
+    return formatNumber(tallyValue(stats[style].local.count) + tallyValue(stats[style].remote.count));
   };
 
   return (

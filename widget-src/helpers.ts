@@ -49,6 +49,14 @@ export const tallyObjectValues = (obj: object): number => {
   return Object.values(obj).reduce((sum, value) => sum + value, 0);
 };
 
+export const tallyValue = (value: object | number): number => {
+  if (typeof value === "object") {
+    return tallyObjectValues(value);
+  } else {
+    return value;
+  }
+};
+
 export const hexToRGBA = (hex: string, alpha = 1): RGBA => {
   // Remove leading #
   hex = hex.replace(/^#/, '');

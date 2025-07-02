@@ -20,7 +20,8 @@ export const auditVariables = async (
   for (const variable of [...variables, ...unusedVariables]) {
     if (variable) {
       const bucket = getVariableBucket(variable, stats);
-      bucket.count++;
+      if (variable.resolvedType === "FLOAT") bucket.count.number++;
+      else bucket.count[variable.resolvedType.toLowerCase() as "color" | "boolean" | "string"]++;
       for (const key in variable.valuesByMode) {
         const modeValue = variable.valuesByMode[key];
         if (modeValue.type && modeValue.type === "VARIABLE_ALIAS") {

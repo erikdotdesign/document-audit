@@ -147,7 +147,12 @@ export const buildOriginComponentStats = (): OriginComponentStats => ({
 });
 
 type SharedVariableStats = {
-  count: number;
+  count: {
+    color: number;
+    number: number;
+    string: number;
+    boolean: number;
+  };
   aliases: {
     color: number;
     number: number;
@@ -160,7 +165,12 @@ type SharedVariableStats = {
 };
 
 const buildSharedVariableStats = (): SharedVariableStats => ({
-  count: 0,
+  count: {
+    color: 0,
+    number: 0,
+    string: 0,
+    boolean: 0
+  },
   aliases: {
     color: 0,
     number: 0,
