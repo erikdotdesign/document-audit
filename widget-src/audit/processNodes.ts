@@ -1,5 +1,5 @@
 import { buildAuditStyleStats } from "./buildStats";
-import { buildStyleIds, collectStyleIdsFromNode, buildComponentStore, collectComponents } from "./helpers";
+import { buildStyleIds, collectStyleIdsFromNode } from "./helpers";
 import { auditPaintStyles } from "./auditPaintStyles";
 import { auditTextStyles } from "./auditTextStyles";
 import { auditEffectStyles } from "./auditEffectStyles";
