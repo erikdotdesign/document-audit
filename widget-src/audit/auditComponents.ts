@@ -1,15 +1,13 @@
-import { OriginComponentStats } from "./buildStats";
+import { LocalComponentStats, OriginComponentStats } from "./buildStats";
 import { getComponentBucket } from "./helpers";
 
 export const auditMainComponent = (
   node: ComponentNode,
   stats: OriginComponentStats,
-  componentIds: Set<string>,
-  componentNodes: ComponentNode[]
+  componentIds: Set<string>
 ) => {
   if (!componentIds.has(node.id)) {
     componentIds.add(node.id);
-    componentNodes.push(node);
     const bucket = getComponentBucket(node, stats);
     const missingDescription = !node.description;
     bucket.count++;
@@ -26,12 +24,11 @@ export const auditComponents = async (
   node: SceneNode,
   stats: OriginComponentStats,
   componentIds: Set<string>,
-  instancedComponentIds: Set<string>,
-  componentNodes: ComponentNode[]
+  instancedComponentIds: Set<string>
 ) => {
   switch(node.type) {
     case "COMPONENT": {
-      auditMainComponent(node, stats, componentIds, componentNodes);
+      auditMainComponent(node, stats, componentIds);
       break;
     }
     case "COMPONENT_SET": {
@@ -44,7 +41,7 @@ export const auditComponents = async (
       const mainComponent = await node.getMainComponentAsync();
       if (mainComponent) {
         instancedComponentIds.add(mainComponent.id);
-        auditMainComponent(mainComponent, stats, componentIds, componentNodes);
+        auditMainComponent(mainComponent, stats, componentIds);
         const bucket = getComponentBucket(mainComponent, stats);
         bucket.instances++;
         if (node.overrides?.length) bucket.overriddenInstances++;
@@ -55,17 +52,12 @@ export const auditComponents = async (
 }
 
 export const auditUnusedComponents = (
-  stats: OriginComponentStats,
+  stats: LocalComponentStats,
   componentIds: Set<string>,
-  instancedComponentIds: Set<string>,
-  componentNodes: ComponentNode[]
+  instancedComponentIds: Set<string>
 ) => {
   const unusedComponentIds = new Set<string>(
     [...componentIds].filter(id => !instancedComponentIds.has(id))
   );
-  for (const unusedComponentId of unusedComponentIds) {
-    const component = componentNodes.find((c) => c.id === unusedComponentId) as ComponentNode;
-    const bucket = getComponentBucket(component, stats);
-    bucket.unusedComponents++;
-  }
+  stats.unused = unusedComponentIds.size;
 }

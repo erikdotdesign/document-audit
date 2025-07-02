@@ -123,12 +123,12 @@ const buildSharedComponentStats = (): SharedComponentStats => ({
 });
 
 export type LocalComponentStats = SharedComponentStats & {
-  unusedComponents: number;
+  unused: number;
 };
 
 export const buildLocalComponentStats = (): LocalComponentStats => ({
   ...buildSharedComponentStats(),
-  unusedComponents: 0
+  unused: 0
 });
 
 export type RemoteComponentStats = SharedComponentStats;

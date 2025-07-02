@@ -22,7 +22,7 @@ export const auditGridStyles = async (
 
   stats.local.unused = unusedGridStyles.length;
 
-  for (const style of gridStyles) {
+  for (const style of [...gridStyles, ...unusedGridStyles]) {
     const bucket = getStyleBucket(style, stats);
     bucket.count++;
     if (!style.description) bucket.missingDescription++;

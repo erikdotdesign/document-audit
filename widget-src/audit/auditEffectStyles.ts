@@ -23,7 +23,7 @@ export const auditEffectStyles = async (
 
   stats.local.unused = unusedEffectStyles.length;
 
-  for (const style of effectStyles) {
+  for (const style of [...effectStyles, ...unusedEffectStyles]) {
     const bucket = getStyleBucket(style, stats);
     bucket.count++;
     if (!style.description) bucket.missingDescription++;

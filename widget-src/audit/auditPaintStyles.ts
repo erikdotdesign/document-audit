@@ -23,7 +23,7 @@ export const auditPaintStyles = async (
 
   stats.local.unused = unusedPaintStyles.length;
 
-  for (const style of paintStyles) {
+  for (const style of [...paintStyles, ...unusedPaintStyles]) {
     const bucket = getStyleBucket(style, stats);
     bucket.count++;
 

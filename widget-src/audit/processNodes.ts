@@ -11,12 +11,11 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]) => {
   const styleIds = buildStyleIds();
   const componentIds = new Set<string>();
   const instancedComponentIds = new Set<string>();
-  const componentNodes = [] as ComponentNode[];
 
   // Traverse nodes once
   for (const node of allNodes) {
     collectStyleIdsFromNode(node, styleIds);
-    await auditComponents(node, stats.components, componentIds, instancedComponentIds, componentNodes);
+    await auditComponents(node, stats.components, componentIds, instancedComponentIds);
   }
 
   // Tally style stats
@@ -25,7 +24,7 @@ export const auditFigmaDocument = async (allNodes: SceneNode[]) => {
   await auditEffectStyles(styleIds.effectStyleIds, stats.effectStyles);
   await auditGridStyles(styleIds.gridStyleIds, stats.gridStyles);
   // Tally unused components (a lot faster than getInstancesAsync)
-  auditUnusedComponents(stats.components, componentIds, instancedComponentIds, componentNodes);
+  auditUnusedComponents(stats.components.local, componentIds, instancedComponentIds);
 
   return stats;
 };
