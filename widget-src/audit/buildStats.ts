@@ -58,28 +58,92 @@ const buildGridStyleProperties = (): GridStyleProps => ({
 	gutterSize: 0
 });
 
-export type BaseStyleStats<T> = {
+type SharedStyleStats<T> = {
   count: number;
-  missingDescription: number;
   unboundProperties: T;
   uniquePropertyTokens: T;
+  missingDescription: number;
 };
 
-export const buildBaseStyleStats = <T>(propertiesConstructor: () => T): BaseStyleStats<T> => ({
+const buildSharedStyleStats = <T>(propertiesConstructor: () => T): SharedStyleStats<T> => ({
   count: 0,
-  missingDescription: 0,
   unboundProperties: propertiesConstructor(),
-  uniquePropertyTokens: propertiesConstructor()
+  uniquePropertyTokens: propertiesConstructor(),
+  missingDescription: 0,
 });
 
+export type LocalStyleStats<T> = SharedStyleStats<T> & {
+  unused: number;
+};
+
+export const buildLocalStyleStats = <T>(props: () => T): LocalStyleStats<T> => ({
+  ...buildSharedStyleStats(props),
+  unused: 0
+});
+
+export type RemoteStyleStats<T> = SharedStyleStats<T>;
+
+export const buildRemoteStyleStats = <T>(props: () => T): RemoteStyleStats<T> =>
+  buildSharedStyleStats(props);
+
 export type OriginStyleStats<T> = {
-  local: BaseStyleStats<T>;
-  remote: BaseStyleStats<T>;
+  local: LocalStyleStats<T>;
+  remote: RemoteStyleStats<T>;
 };
 
 export const buildOriginStyleStats = <T>(propertiesConstructor: () => T): OriginStyleStats<T> => ({
-  local: buildBaseStyleStats(propertiesConstructor),
-  remote: buildBaseStyleStats(propertiesConstructor)
+  local: buildLocalStyleStats(propertiesConstructor),
+  remote: buildRemoteStyleStats(propertiesConstructor)
+});
+
+type SharedComponentStats = {
+  count: number;
+  sets: number;
+  instances: number;
+  variants: number;
+  missingDescription: {
+    components: number;
+    sets: number;
+    variants: number;
+  };
+  overriddenInstances: number;
+};
+
+const buildSharedComponentStats = (): SharedComponentStats => ({
+  count: 0,
+  sets: 0,
+  instances: 0,
+  variants: 0,
+  missingDescription: {
+    components: 0,
+    sets: 0,
+    variants: 0
+  },
+  overriddenInstances: 0
+});
+
+export type LocalComponentStats = SharedComponentStats & {
+  unusedComponents: number;
+};
+
+export const buildLocalComponentStats = (): LocalComponentStats => ({
+  ...buildSharedComponentStats(),
+  unusedComponents: 0
+});
+
+export type RemoteComponentStats = SharedComponentStats;
+
+export const buildRemoteComponentStats = (): RemoteComponentStats =>
+  buildSharedComponentStats();
+
+export type OriginComponentStats = {
+  local: LocalComponentStats;
+  remote: RemoteComponentStats;
+};
+
+export const buildOriginComponentStats = (): OriginComponentStats => ({
+  local: buildLocalComponentStats(),
+  remote: buildRemoteComponentStats()
 });
 
 export type AuditStyleStats = {
@@ -87,11 +151,13 @@ export type AuditStyleStats = {
   textStyles: OriginStyleStats<TextStyleProps>;
   effectStyles: OriginStyleStats<EffectStyleProps>;
   gridStyles: OriginStyleStats<GridStyleProps>;
+  components: OriginComponentStats;
 };
 
 export const buildAuditStyleStats = (): AuditStyleStats => ({
   colorStyles: buildOriginStyleStats(buildColorStyleProperties),
   textStyles: buildOriginStyleStats(buildTextStyleProperties),
   effectStyles: buildOriginStyleStats(buildEffectStyleProperties),
-  gridStyles: buildOriginStyleStats(buildGridStyleProperties)
+  gridStyles: buildOriginStyleStats(buildGridStyleProperties),
+  components: buildOriginComponentStats()
 });

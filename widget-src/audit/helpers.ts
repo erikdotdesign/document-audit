@@ -1,4 +1,4 @@
-import { BaseStyleStats, OriginStyleStats } from "./buildStats";
+import { LocalStyleStats, OriginComponentStats, OriginStyleStats, RemoteStyleStats, LocalComponentStats, RemoteComponentStats } from "./buildStats";
 
 type NodeStyleId = "fillStyleId" | "strokeStyleId" | "textStyleId" | "effectStyleId" | "gridStyleId";
 
@@ -22,7 +22,7 @@ export const collectStyleIdsFromNode = (
   ];
 
   for (const [idType, styleProp] of entries) {
-    if (styleProp in node && node[styleProp]) {
+    if (styleProp in node && node[styleProp] && node[styleProp] !== figma.mixed) {
       styleIds[idType].add(node[styleProp]);
     }
   }
@@ -31,6 +31,13 @@ export const collectStyleIdsFromNode = (
 export const getStyleBucket = <T>(
   style: BaseStyle,
   stats: OriginStyleStats<T>
-): BaseStyleStats<T> => {
+): LocalStyleStats<T> | RemoteStyleStats<T> => {
   return style.remote ? stats.remote : stats.local;
+};
+
+export const getComponentBucket = (
+  componentNode: ComponentNode | ComponentSetNode,
+  stats: OriginComponentStats
+): LocalComponentStats | RemoteComponentStats => {
+  return componentNode.remote ? stats.remote : stats.local;
 };

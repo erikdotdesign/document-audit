@@ -34,9 +34,9 @@ const StyleStats = ({ routeStyle, stats, setRoute, setBreadcrumbs }: StyleStatsP
         right: style.padding.medium
       }}
       spacing={style.spacing.medium}>
-      <PieChart
+      {/* <PieChart
         stats={stats}
-        routeStyle={routeStyle} />
+        routeStyle={routeStyle} /> */}
       <AutoLayout
         direction="vertical"
         width="fill-parent">

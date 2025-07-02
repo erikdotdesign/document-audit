@@ -1,8 +1,8 @@
 import { OriginStyleStats, TextStyleProps } from "./buildStats";
 import { getStyleBucket } from "./helpers";
 
-export const auditTextStyles = (
-  textStyles: TextStyle[],
+export const auditTextStyles = async (
+  textStyleIds: Set<string>,
   stats: OriginStyleStats<TextStyleProps>
 ) => {
   const textTokenIds: Record<keyof TextStyleProps, Set<string>> = {
@@ -14,6 +14,16 @@ export const auditTextStyles = (
     paragraphSpacing: new Set(),
     paragraphIndent: new Set()
   };
+
+  const localTextStyles = await figma.getLocalTextStylesAsync();
+
+  const textStyles = await Promise.all(
+    [...textStyleIds].map(id => figma.getStyleByIdAsync(id))
+  ) as TextStyle[];
+
+  const unusedTextStyles = localTextStyles.filter(s => !textStyleIds.has(s.id));
+
+  stats.local.unused = unusedTextStyles.length;
 
   for (const style of textStyles) {
     const bucket = getStyleBucket(style, stats);
@@ -30,7 +40,13 @@ export const auditTextStyles = (
           bucket.uniquePropertyTokens[key]++;
         }
       } else {
-        bucket.unboundProperties[key]++;
+        // Only count as unbound if the property exists on the style with a meaningful value
+        const value = style[key];
+        const isMeaningful = value !== undefined && value !== 0;
+
+        if (isMeaningful) {
+          bucket.unboundProperties[key]++;
+        }
       }
     }
   }

@@ -1,8 +1,8 @@
 import { OriginStyleStats, EffectStyleProps } from "./buildStats";
 import { getStyleBucket } from "./helpers";
 
-export const auditEffectStyles = (
-  effectStyles: EffectStyle[],
+export const auditEffectStyles = async (
+  effectStyleIds: Set<string>,
   stats: OriginStyleStats<EffectStyleProps>
 ) => {
   const effectTokenIds: Record<keyof EffectStyleProps, Set<string>> = {
@@ -12,6 +12,16 @@ export const auditEffectStyles = (
     offsetX: new Set(),
     offsetY: new Set()
   };
+
+  const localEffectStyles = await figma.getLocalEffectStylesAsync();
+
+  const effectStyles = await Promise.all(
+    [...effectStyleIds].map(id => figma.getStyleByIdAsync(id))
+  ) as EffectStyle[];
+
+  const unusedEffectStyles = localEffectStyles.filter(s => !effectStyleIds.has(s.id));
+
+  stats.local.unused = unusedEffectStyles.length;
 
   for (const style of effectStyles) {
     const bucket = getStyleBucket(style, stats);

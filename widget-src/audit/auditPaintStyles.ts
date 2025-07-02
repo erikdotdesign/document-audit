@@ -1,12 +1,27 @@
 import { OriginStyleStats, ColorStyleProps } from "./buildStats";
 import { getStyleBucket } from "./helpers";
 
-export const auditPaintStyles = (
-  paintStyles: PaintStyle[],
+export const auditPaintStyles = async (
+  paintStylesIds: Set<string>,
   stats: OriginStyleStats<ColorStyleProps>
 ) => {
   const colorTokenIds = new Set<string>();
   const colorStopTokenIds = new Set<string>();
+
+  const localPaintStyles = await figma.getLocalPaintStylesAsync();
+
+  const paintStyles = await Promise.all(
+    [...paintStylesIds].map(id => {
+      if (typeof id !== "string") {
+        console.warn("Invalid ID passed to getStyleByIdAsync:", id);
+      }
+      return figma.getStyleByIdAsync(id);
+    })
+  ) as PaintStyle[];
+
+  const unusedPaintStyles = localPaintStyles.filter(s => !paintStylesIds.has(s.id));
+
+  stats.local.unused = unusedPaintStyles.length;
 
   for (const style of paintStyles) {
     const bucket = getStyleBucket(style, stats);

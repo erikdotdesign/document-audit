@@ -1,8 +1,8 @@
 import { OriginStyleStats, GridStyleProps } from "./buildStats";
 import { getStyleBucket } from "./helpers";
 
-export const auditGridStyles = (
-  gridStyles: GridStyle[],
+export const auditGridStyles = async (
+  gridStyleIds: Set<string>,
   stats: OriginStyleStats<GridStyleProps>
 ) => {
   const gridTokenIds: Record<keyof GridStyleProps, Set<string>> = {
@@ -11,6 +11,16 @@ export const auditGridStyles = (
     offset: new Set(),
     gutterSize: new Set()
   };
+
+  const localGridStyles = await figma.getLocalGridStylesAsync();
+
+  const gridStyles = await Promise.all(
+    [...gridStyleIds].map(id => figma.getStyleByIdAsync(id))
+  ) as GridStyle[];
+
+  const unusedGridStyles = localGridStyles.filter(s => !gridStyleIds.has(s.id));
+
+  stats.local.unused = unusedGridStyles.length;
 
   for (const style of gridStyles) {
     const bucket = getStyleBucket(style, stats);

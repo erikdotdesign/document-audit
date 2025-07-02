@@ -2,7 +2,7 @@ import { AuditStyleStats, buildAuditStyleStats } from './audit/buildStats';
 import { auditFigmaDocument } from './audit/processNodes';
 import { Route, Breadcrumb } from './routes';
 import Header from './components/Header';
-import Router from './components/Router';
+import Router from './components/views/Router';
 import Footer from './components/Footer';
 import style from './style';
 

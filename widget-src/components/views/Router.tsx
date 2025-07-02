@@ -1,8 +1,8 @@
-import { Route, Breadcrumb } from '../routes';
-import { AuditStyleStats } from '../audit/buildStats';
-import Home from './views/Home';
-import StyleStats from './views/StyleStats';
-import StyleOriginStats from './views/StyleOriginStats';
+import { Route, Breadcrumb } from '../../routes';
+import { AuditStyleStats } from '../../audit/buildStats';
+import Home from './Home';
+import StyleStats from './StyleStats';
+import StyleOriginStats from './StyleOriginStats';
 
 interface RouterProps {
   stats: AuditStyleStats;
