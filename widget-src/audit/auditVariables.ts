@@ -32,9 +32,6 @@ export const auditVariables = async (
 
   for (const variableCollection of variableCollections) {
     if (variableCollection) {
-      if (variableCollection.remote) {
-        console.log(variableCollection.name);
-      }
       const bucket = getVariableBucket(variableCollection, stats);
       bucket.collections++;
       bucket.modes = bucket.modes + variableCollection.modes.length;
