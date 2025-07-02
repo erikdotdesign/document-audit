@@ -24,7 +24,11 @@ export const auditVariables = async (
       for (const key in variable.valuesByMode) {
         const modeValue = variable.valuesByMode[key];
         if (modeValue.type && modeValue.type === "VARIABLE_ALIAS") {
-          bucket.aliases++;
+          const resolvedVariable = await figma.variables.getVariableByIdAsync(modeValue.id);
+          if (resolvedVariable) {
+            if (resolvedVariable.resolvedType === "FLOAT") bucket.aliases.number++;
+            else bucket.aliases[resolvedVariable.resolvedType.toLowerCase()]++;
+          }
         }
       }
       if (!variable.description) bucket.missingDescriptions++;
