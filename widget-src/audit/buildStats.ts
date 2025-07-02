@@ -208,7 +208,7 @@ export const buildOriginVariableStats = (): OriginVariableStats => ({
 
 export type FrameStats = {
   count: number;
-  freeForm: number;
+  freeFormLayouts: number;
   autoLayouts: {
     vertical: number;
     horizontal: number;
@@ -241,7 +241,7 @@ export type FrameStats = {
 
 export const buildFrameStats = () => ({
   count: 0,
-  freeForm: 0,
+  freeFormLayouts: 0,
   autoLayouts: {
     vertical: 0,
     horizontal: 0,

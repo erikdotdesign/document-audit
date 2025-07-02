@@ -10,7 +10,7 @@ export const auditFrames = async (
     const bucket = stats.local;
     bucket.count++;
 
-    if (node.layoutMode === "NONE") bucket.freeForm++;
+    if (node.layoutMode === "NONE") bucket.freeFormLayouts++;
     else bucket.autoLayouts[node.layoutMode.toLowerCase() as "horizontal" | "vertical"]++;
 
     if (node.layoutSizingHorizontal === "FIXED") bucket.fixedDimensions.width++;
