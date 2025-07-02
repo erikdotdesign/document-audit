@@ -27,7 +27,7 @@ export const auditVariables = async (
           const resolvedVariable = await figma.variables.getVariableByIdAsync(modeValue.id);
           if (resolvedVariable) {
             if (resolvedVariable.resolvedType === "FLOAT") bucket.aliases.number++;
-            else bucket.aliases[resolvedVariable.resolvedType.toLowerCase()]++;
+            else bucket.aliases[resolvedVariable.resolvedType.toLowerCase() as "color" | "boolean" | "string"]++;
           }
         }
       }

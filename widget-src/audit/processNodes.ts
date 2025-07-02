@@ -1,22 +1,25 @@
 import { buildAuditStyleStats } from "./buildStats";
-import { buildStyleIds, collectStyleIdsFromNode, collectBoundVarsFromNode, buildComponentIds } from "./helpers";
+import { buildStyleIds, collectStyleIdsFromNode, collectBoundVarsFromNode, buildComponentIds, buildFramePropsMap } from "./helpers";
 import { auditPaintStyles } from "./auditPaintStyles";
 import { auditTextStyles } from "./auditTextStyles";
 import { auditEffectStyles } from "./auditEffectStyles";
 import { auditGridStyles } from "./auditGridStyles";
 import { auditComponents, auditUnusedComponents } from "./auditComponents";
 import { auditVariables } from "./auditVariables";
+import { auditFrames } from "./auditFrames";
 
 export const auditFigmaDocument = async (allNodes: SceneNode[]) => {
   const stats = buildAuditStyleStats();
   const styleIds = buildStyleIds();
   const variableIds = new Set<string>();
+  const framePropsMap = buildFramePropsMap();
   const componentIds = buildComponentIds();
 
   // Traverse nodes once
   for (const node of allNodes) {
     collectStyleIdsFromNode(node, styleIds);
     collectBoundVarsFromNode(node, variableIds);
+    auditFrames(node, stats.frames, framePropsMap);
     await auditComponents(node, stats.components, componentIds.ids, componentIds.instancedIds);
   }
 

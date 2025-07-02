@@ -45,7 +45,7 @@ export const formatDate = (timestamp: number): string => {
   return `${month}/${day}/${year}, ${hours}:${minutes}:${seconds} ${ampm}`;
 };
 
-export const tallyObjectValues = (obj: object) => {
+export const tallyObjectValues = (obj: object): number => {
   return Object.values(obj).reduce((sum, value) => sum + value, 0);
 };
 

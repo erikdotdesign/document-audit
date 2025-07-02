@@ -1,4 +1,4 @@
-import { LocalStyleStats, OriginComponentStats, OriginStyleStats, RemoteStyleStats, LocalComponentStats, RemoteComponentStats, OriginVariableStats, LocalVariableStats, RemoteVariableStats } from "./buildStats";
+import { LocalStyleStats, OriginComponentStats, OriginStyleStats, RemoteStyleStats, LocalComponentStats, RemoteComponentStats, OriginVariableStats, LocalVariableStats, RemoteVariableStats, OriginFrameStats, FrameStats } from "./buildStats";
 
 type NodeStyleId = "fillStyleId" | "strokeStyleId" | "textStyleId" | "effectStyleId" | "gridStyleId";
 
@@ -58,6 +58,69 @@ export const collectBoundVarsFromNode = (
       }
     }
   }
+}
+
+export type FrameStrokeWeightProps = "strokeTopWeight" | "strokeBottomWeight" | "strokeLeftWeight" | "strokeRightWeight";
+export type FrameCornerRadiusProps = "topLeftRadius" | "topRightRadius" | "bottomLeftRadius" | "bottomRightRadius";
+export type FramePaddingProps = "paddingTop" | "paddingBottom" | "paddingLeft" | "paddingRight";
+export type FrameSpacingProps = "itemSpacing" | "counterAxisSpacing";
+export type FrameMinMaxProps = "minWidth" | "minHeight" | "maxWidth" | "maxHeight";
+export type FrameStatProp = "strokeWeight" | "cornerRadius" | "padding" | "spacing" | FrameMinMaxProps;
+
+export type FramePropMap = {
+  key: FrameStrokeWeightProps | FrameCornerRadiusProps | FramePaddingProps | FrameSpacingProps | FrameMinMaxProps;
+  tokens: Set<string>;
+  stat: FrameStatProp;
+};
+
+export const buildFramePropsMap = (): FramePropMap[] => {
+  const strokeWeightProps = ["strokeTopWeight", "strokeBottomWeight", "strokeLeftWeight", "strokeRightWeight"] as FrameStrokeWeightProps[];
+  const cornerRadiusProps = ["topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius"] as FrameCornerRadiusProps[];
+  const paddingProps = ["paddingTop", "paddingBottom", "paddingLeft", "paddingRight"] as FramePaddingProps[];
+  const spacingProps = ["itemSpacing", "counterAxisSpacing"] as FrameSpacingProps[];
+  const minMaxProps = ["minWidth", "minHeight", "maxWidth", "maxHeight"] as FrameMinMaxProps[];
+
+  const strokeWeightTokenIds = new Set<string>();
+  const strokeWeightPropsMap = strokeWeightProps.map((prop) => ({
+    key: prop,
+    tokens: strokeWeightTokenIds,
+    stat: "strokeWeight"
+  })) as FramePropMap[];
+
+  const cornerRadiusTokenIds = new Set<string>();
+  const cornerRadiusPropsMap = cornerRadiusProps.map((prop) => ({
+    key: prop,
+    tokens: cornerRadiusTokenIds,
+    stat: "cornerRadius"
+  })) as FramePropMap[];
+
+  const paddingTokenIds = new Set<string>();
+  const paddingPropsMap = paddingProps.map((prop) => ({
+    key: prop,
+    tokens: paddingTokenIds,
+    stat: "padding"
+  })) as FramePropMap[];
+
+  const spacingTokenIds = new Set<string>();
+  const spacingPropsMap = spacingProps.map((prop) => ({
+    key: prop,
+    tokens: spacingTokenIds,
+    stat: "spacing"
+  })) as FramePropMap[];
+
+  const minMaxPropsMap = minMaxProps.map((prop) => ({
+    key: prop,
+    tokens: new Set<string>(),
+    stat: prop
+  })) as FramePropMap[];
+
+  return [
+    ...strokeWeightPropsMap,
+    ...cornerRadiusPropsMap,
+    ...paddingPropsMap, 
+    ...spacingPropsMap, 
+    ...minMaxPropsMap
+  ];
 }
 
 export const getStyleBucket = <T>(

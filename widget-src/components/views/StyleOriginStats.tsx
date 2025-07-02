@@ -1,6 +1,6 @@
 import { StyleOriginRouteType, StyleRouteType } from '../../routes';
 import style from "../../style";
-import { camelCaseToSentence, typedKeys, tallyObjectValues } from "../../helpers";
+import { camelCaseToSentence, typedKeys, tallyObjectValues, formatNumber } from "../../helpers";
 import { AuditStyleStats } from "../../audit/buildStats";
 
 const { widget } = figma;
@@ -54,8 +54,8 @@ const StyleOriginStats = ({ stats, routeStyle, routeOrigin }: StyleOriginStatsPr
                 fontWeight={style.fontWeight.bold}>
                 { 
                   typeof stats[routeStyle][routeOrigin][key] === 'object'
-                  ? tallyObjectValues(stats[routeStyle][routeOrigin][key])
-                  : stats[routeStyle][routeOrigin][key]
+                  ? formatNumber(tallyObjectValues(stats[routeStyle][routeOrigin][key]))
+                  : formatNumber(stats[routeStyle][routeOrigin][key])
                 }
               </Text>
             </AutoLayout>
@@ -95,7 +95,7 @@ const StyleOriginStats = ({ stats, routeStyle, routeOrigin }: StyleOriginStatsPr
                             lineHeight={style.lineHeight.shmedium}
                             fontWeight={style.fontWeight.bold}
                             fill={style.color.gray}>
-                            { stats[routeStyle][routeOrigin][key][kk] }
+                            { formatNumber(stats[routeStyle][routeOrigin][key][kk]) }
                           </Text>
                         </AutoLayout>
                       </AutoLayout>

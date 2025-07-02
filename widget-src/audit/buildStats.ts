@@ -196,20 +196,98 @@ export const buildOriginVariableStats = (): OriginVariableStats => ({
   remote: buildRemoteVariableStats()
 });
 
+export type FrameStats = {
+  count: number;
+  freeForm: number;
+  autoLayouts: {
+    vertical: number;
+    horizontal: number;
+  };
+  fixedDimensions: {
+    width: number;
+    height: number;
+  };
+  unboundProperties: {
+    padding: number;
+    spacing: number;
+    strokeWeight: number;
+    cornerRadius: number;
+    minWidth: number;
+    minHeight: number;
+    maxWidth: number;
+    maxHeight: number;
+  };
+  uniquePropertyTokens: {
+    padding: number;
+    spacing: number;
+    strokeWeight: number;
+    cornerRadius: number;
+    minWidth: number;
+    minHeight: number;
+    maxWidth: number;
+    maxHeight: number;
+  };
+};
+
+export const buildFrameStats = () => ({
+  count: 0,
+  freeForm: 0,
+  autoLayouts: {
+    vertical: 0,
+    horizontal: 0,
+  },
+  fixedDimensions: {
+    width: 0,
+    height: 0,
+  },
+  unboundProperties: {
+    padding: 0,
+    spacing: 0,
+    strokeWeight: 0,
+    cornerRadius: 0,
+    minWidth: 0,
+    minHeight: 0,
+    maxWidth: 0,
+    maxHeight: 0,
+  },
+  uniquePropertyTokens: {
+    padding: 0,
+    spacing: 0,
+    strokeWeight: 0,
+    cornerRadius: 0,
+    minWidth: 0,
+    minHeight: 0,
+    maxWidth: 0,
+    maxHeight: 0
+  }
+});
+
+export type OriginFrameStats = {
+  local: FrameStats;
+  remote: FrameStats;
+};
+
+export const buildOriginFrameStats = (): OriginFrameStats => ({
+  local: buildFrameStats(),
+  remote: buildFrameStats()
+});
+
 export type AuditStyleStats = {
+  variables: OriginVariableStats;
   colorStyles: OriginStyleStats<ColorStyleProps>;
   textStyles: OriginStyleStats<TextStyleProps>;
   effectStyles: OriginStyleStats<EffectStyleProps>;
   gridStyles: OriginStyleStats<GridStyleProps>;
+  frames: OriginFrameStats;
   components: OriginComponentStats;
-  variables: OriginVariableStats;
 };
 
 export const buildAuditStyleStats = (): AuditStyleStats => ({
+  variables: buildOriginVariableStats(),
   colorStyles: buildOriginStyleStats(buildColorStyleProperties),
   textStyles: buildOriginStyleStats(buildTextStyleProperties),
   effectStyles: buildOriginStyleStats(buildEffectStyleProperties),
   gridStyles: buildOriginStyleStats(buildGridStyleProperties),
-  components: buildOriginComponentStats(),
-  variables: buildOriginVariableStats()
+  frames: buildOriginFrameStats(),
+  components: buildOriginComponentStats()
 });

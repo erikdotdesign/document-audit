@@ -1,6 +1,6 @@
 import { Route, Breadcrumb, StyleOriginRouteType, StyleRouteType, navigate } from '../../routes';
 import style from "../../style";
-import { camelCaseToTitleCase, camelCaseToSentence, typedKeys } from "../../helpers";
+import { camelCaseToTitleCase, camelCaseToSentence, typedKeys, formatNumber } from "../../helpers";
 import { AuditStyleStats } from "../../audit/buildStats";
 import PieChart from '../PieChart';
 
@@ -68,7 +68,7 @@ const StyleStats = ({ routeStyle, stats, setRoute, setBreadcrumbs }: StyleStatsP
                 fontSize={style.fontSize.shmedium}
                 lineHeight={style.lineHeight.shmedium}
                 fontWeight={style.fontWeight.bold}>
-                { stats[routeStyle][key].count } →
+                { formatNumber(stats[routeStyle][key].count) } →
               </Text>
             </AutoLayout>
           ))
