@@ -1,5 +1,5 @@
 {
-  "name": "audit",
+  "name": "document-audit",
   "version": "1.0.0",
   "description": "Figma document audit widget",
   "scripts": {

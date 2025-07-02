@@ -1,5 +1,5 @@
 {
-  "name": "audit",
+  "name": "document-audit",
   "id": "1519387347885061718",
   "api": "1.0.0",
   "main": "dist/code.js",
