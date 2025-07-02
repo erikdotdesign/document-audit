@@ -62,14 +62,14 @@ type SharedStyleStats<T> = {
   count: number;
   unboundProperties: T;
   uniquePropertyTokens: T;
-  missingDescription: number;
+  missingDescriptions: number;
 };
 
 const buildSharedStyleStats = <T>(propertiesConstructor: () => T): SharedStyleStats<T> => ({
   count: 0,
   unboundProperties: propertiesConstructor(),
   uniquePropertyTokens: propertiesConstructor(),
-  missingDescription: 0,
+  missingDescriptions: 0,
 });
 
 export type LocalStyleStats<T> = SharedStyleStats<T> & {
@@ -101,7 +101,7 @@ type SharedComponentStats = {
   sets: number;
   instances: number;
   variants: number;
-  missingDescription: {
+  missingDescriptions: {
     components: number;
     sets: number;
     variants: number;
@@ -114,7 +114,7 @@ const buildSharedComponentStats = (): SharedComponentStats => ({
   sets: 0,
   instances: 0,
   variants: 0,
-  missingDescription: {
+  missingDescriptions: {
     components: 0,
     sets: 0,
     variants: 0
@@ -146,12 +146,51 @@ export const buildOriginComponentStats = (): OriginComponentStats => ({
   remote: buildRemoteComponentStats()
 });
 
+type SharedVariableStats = {
+  count: number;
+  collections: number;
+  modes: number;
+  missingDescriptions: number;
+};
+
+const buildSharedVariableStats = (): SharedVariableStats => ({
+  count: 0,
+  collections: 0,
+  modes: 0,
+  missingDescriptions: 0
+});
+
+export type LocalVariableStats = SharedVariableStats & {
+  unused: number;
+};
+
+export const buildLocalVariableStats = (): LocalVariableStats => ({
+  ...buildSharedVariableStats(),
+  unused: 0
+});
+
+export type RemoteVariableStats = SharedVariableStats;
+
+export const buildRemoteVariableStats = (): RemoteVariableStats =>
+  buildSharedVariableStats();
+
+export type OriginVariableStats = {
+  local: LocalVariableStats;
+  remote: RemoteVariableStats;
+};
+
+export const buildOriginVariableStats = (): OriginVariableStats => ({
+  local: buildLocalVariableStats(),
+  remote: buildRemoteVariableStats()
+});
+
 export type AuditStyleStats = {
   colorStyles: OriginStyleStats<ColorStyleProps>;
   textStyles: OriginStyleStats<TextStyleProps>;
   effectStyles: OriginStyleStats<EffectStyleProps>;
   gridStyles: OriginStyleStats<GridStyleProps>;
   components: OriginComponentStats;
+  variables: OriginVariableStats;
 };
 
 export const buildAuditStyleStats = (): AuditStyleStats => ({
@@ -159,5 +198,6 @@ export const buildAuditStyleStats = (): AuditStyleStats => ({
   textStyles: buildOriginStyleStats(buildTextStyleProperties),
   effectStyles: buildOriginStyleStats(buildEffectStyleProperties),
   gridStyles: buildOriginStyleStats(buildGridStyleProperties),
-  components: buildOriginComponentStats()
+  components: buildOriginComponentStats(),
+  variables: buildOriginVariableStats()
 });

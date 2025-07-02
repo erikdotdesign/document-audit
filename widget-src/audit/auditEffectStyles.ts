@@ -26,7 +26,7 @@ export const auditEffectStyles = async (
   for (const style of [...effectStyles, ...unusedEffectStyles]) {
     const bucket = getStyleBucket(style, stats);
     bucket.count++;
-    if (!style.description) bucket.missingDescription++;
+    if (!style.description) bucket.missingDescriptions++;
 
     for (const effect of style.effects) {
       if (effect.type === "NOISE" || effect.type === "TEXTURE") return;

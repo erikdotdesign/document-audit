@@ -28,7 +28,7 @@ export const auditTextStyles = async (
   for (const style of [...textStyles, ...unusedTextStyles]) {
     const bucket = getStyleBucket(style, stats);
     bucket.count++;
-    if (!style.description) bucket.missingDescription++;
+    if (!style.description) bucket.missingDescriptions++;
 
     const boundVariables = style.boundVariables || {};
 

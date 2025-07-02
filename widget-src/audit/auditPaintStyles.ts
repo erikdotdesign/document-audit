@@ -27,7 +27,7 @@ export const auditPaintStyles = async (
     const bucket = getStyleBucket(style, stats);
     bucket.count++;
 
-    if (!style.description) bucket.missingDescription++;
+    if (!style.description) bucket.missingDescriptions++;
 
     for (const paint of style.paints) {
       if (paint.type === "SOLID") {
