@@ -21,6 +21,12 @@ export const auditVariables = async (
     if (variable) {
       const bucket = getVariableBucket(variable, stats);
       bucket.count++;
+      for (const key in variable.valuesByMode) {
+        const modeValue = variable.valuesByMode[key];
+        if (modeValue.type && modeValue.type === "VARIABLE_ALIAS") {
+          bucket.aliases++;
+        }
+      }
       if (!variable.description) bucket.missingDescriptions++;
       variableCollectionIds.add(variable.variableCollectionId);
     }
