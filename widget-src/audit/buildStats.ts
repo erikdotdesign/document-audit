@@ -419,7 +419,7 @@ export type AuditStats = {
   layers: OriginLayerStats;
   variables: OriginVariableStats;
   colorStyles: OriginStyleStats<ColorStyleProps, ColorStyleExtras>;
-  textStyles: OriginStyleStats<TextStyleProps, null>;
+  textStyles: OriginStyleStats<TextStyleProps, object>;
   effectStyles: OriginStyleStats<EffectStyleProps, EffectStyleExtras>;
   gridStyles: OriginStyleStats<GridStyleProps, GridStyleExtras>;
   frames: OriginFrameStats;
@@ -430,7 +430,7 @@ export const buildAuditStats = (): AuditStats => ({
   layers: buildOriginLayerStats(),
   variables: buildOriginVariableStats(),
   colorStyles: buildOriginStyleStats<ColorStyleProps, ColorStyleExtras>(buildColorStyleProperties, buildColorStyleExtras),
-  textStyles: buildOriginStyleStats(buildTextStyleProperties, () => null),
+  textStyles: buildOriginStyleStats(buildTextStyleProperties, () => ({})),
   effectStyles: buildOriginStyleStats<EffectStyleProps, EffectStyleExtras>(buildEffectStyleProperties, buildEffectStyleExtras),
   gridStyles: buildOriginStyleStats<GridStyleProps, GridStyleExtras>(buildGridStyleProperties, buildGridStyleExtras),
   frames: buildOriginFrameStats(),
