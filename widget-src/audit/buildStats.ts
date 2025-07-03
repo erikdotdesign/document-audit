@@ -15,7 +15,7 @@ export type TextStyleProps = {
 	letterSpacing: number;
 	lineHeight: number;
 	paragraphSpacing: number;
-	paragraphIndent:number;
+	paragraphIndent: number;
 };
 
 const buildTextStyleProperties = (): TextStyleProps => ({
@@ -33,7 +33,7 @@ export type EffectStyleProps = {
 	color: number;
 	spread: number;
 	offsetX: number;
-	offsetY:number;
+	offsetY: number;
 };
 
 const buildEffectStyleProperties = (): EffectStyleProps => ({
@@ -48,7 +48,7 @@ export type GridStyleProps = {
   sectionSize: number;
 	count: number;
 	offset: number;
-	gutterSize:number;
+	gutterSize: number;
 };
 
 const buildGridStyleProperties = (): GridStyleProps => ({

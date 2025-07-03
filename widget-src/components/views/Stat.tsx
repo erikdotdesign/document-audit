@@ -4,13 +4,13 @@ import { camelCaseToSentence, typedKeys, formatNumber, tallyValue } from "../../
 const { widget } = figma;
 const { AutoLayout, Text } = widget;
 
-interface AuditStatProps {
+interface StatProps {
   statKey: string;
   keyValue: "object" | number;
   bg: boolean;
 }
 
-const AuditStat = ({ statKey, keyValue, bg }: AuditStatProps) => {
+const Stat = ({ statKey, keyValue, bg }: StatProps) => {
   return (
     <AutoLayout
       width="fill-parent"
@@ -91,4 +91,4 @@ const AuditStat = ({ statKey, keyValue, bg }: AuditStatProps) => {
   );
 };
 
-export default AuditStat;
+export default Stat;

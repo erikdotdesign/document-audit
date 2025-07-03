@@ -1,13 +1,13 @@
 import { Route, Breadcrumb, RouteStatType, navigate } from '../../routes';
 import style from "../../style";
 import { formatNumber, camelCaseToTitleCase, camelCaseToSentenceLower, typedKeys, tallyValue } from "../../helpers";
-import { AuditStyleStats } from "../../audit/buildStats";
+import { AuditStats } from "../../audit/buildStats";
 
 const { widget } = figma;
 const { AutoLayout, Text, Span } = widget;
 
 interface HomeProps {
-  stats: AuditStyleStats;
+  stats: AuditStats;
   setRoute: (route: Route) => void;
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
 }

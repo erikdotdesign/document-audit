@@ -50,8 +50,8 @@ export const Widget = () => {
     const nodes = figma.root.findAll();
     console.log(`✅ Hydrated ${nodes.length} nodes`);
 
-    const auditStyleStats = await auditFigmaDocument(nodes);
-    setStats(auditStyleStats);
+    const auditStats = await auditFigmaDocument(nodes);
+    setStats(auditStats);
     setLastAuditKey(currentAuditKey);
     setLoading(false);
     figma.closePlugin();

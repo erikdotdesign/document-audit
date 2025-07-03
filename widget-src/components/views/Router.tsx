@@ -1,10 +1,10 @@
 import { Route, Breadcrumb } from '../../routes';
-import { AuditStyleStats } from '../../audit/buildStats';
+import { AuditStats } from '../../audit/buildStats';
 import Home from './Home';
-import AuditStats from './AuditStats';
+import Stats from './Stats';
 
 interface RouterProps {
-  stats: AuditStyleStats;
+  stats: AuditStats;
   route: Route;
   setRoute: (route: Route) => void;
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
@@ -21,7 +21,7 @@ const Router = ({stats, route, setRoute, setBreadcrumbs}: RouterProps) => {
       )
     case "stat":
       return (
-        <AuditStats
+        <Stats
           stats={stats}
           routeStat={route.stat}
           routeOriginStat="local"
@@ -30,7 +30,7 @@ const Router = ({stats, route, setRoute, setBreadcrumbs}: RouterProps) => {
       )
     case "originStat":
       return (
-        <AuditStats
+        <Stats
           stats={stats}
           routeStat={route.stat}
           routeOriginStat="remote"

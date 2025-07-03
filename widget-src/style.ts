@@ -27,7 +27,7 @@ const style = {
     shmedium: 16,
     medium: 24,
     large: 32,
-    display: 56
+    display: 72
   },
   lineHeight: {
     small: 24,

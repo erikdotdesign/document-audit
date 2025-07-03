@@ -13,9 +13,8 @@ export const camelCaseToTitleCase = (str: string): string => {
 };
 
 export const camelCaseToSentence = (str: string): string => {
-  return str
-    .replace(/([A-Z])/g, ' $1')
-    .replace(/^./, char => char.toUpperCase());
+  const sentence = str.replace(/([A-Z])/g, ' $1');
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1).toLowerCase();
 };
 
 export const camelCaseToSentenceLower = (str: string): string => {

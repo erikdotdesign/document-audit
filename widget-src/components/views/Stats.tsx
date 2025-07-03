@@ -1,21 +1,21 @@
-import { RouteStatType, RouteOriginStatType, navigate } from '../../routes';
+import { RouteStatType, RouteOriginStatType, navigate, Route, Breadcrumb } from '../../routes';
 import style from "../../style";
 import { typedKeys, camelCaseToTitleCase, camelCaseToSentence } from "../../helpers";
-import { AuditStyleStats } from "../../audit/buildStats";
-import AuditStat from './AuditStat';
+import { AuditStats } from "../../audit/buildStats";
+import Stat from './Stat';
 
 const { widget } = figma;
 const { AutoLayout, Text } = widget;
 
-interface AuditStatsProps {
-  stats: AuditStyleStats;
+interface StatsProps {
+  stats: AuditStats;
   routeStat: RouteStatType;
   routeOriginStat: RouteOriginStatType;
   setRoute: (route: Route) => void;
   setBreadcrumbs: (breadcrumbs: Breadcrumb[]) => void;
 }
 
-const AuditStats = ({ stats, routeStat, routeOriginStat, setRoute, setBreadcrumbs }: AuditStatsProps) => {
+const Stats = ({ stats, routeStat, routeOriginStat, setRoute, setBreadcrumbs }: StatsProps) => {
 
   const handleNavigate = (originStat: RouteOriginStatType) => {
     navigate(
@@ -38,7 +38,7 @@ const AuditStats = ({ stats, routeStat, routeOriginStat, setRoute, setBreadcrumb
       }}>
       {
         typedKeys(stats[routeStat][routeOriginStat]).map((key, index) => (
-          <AuditStat
+          <Stat
             key={key}
             statKey={key}
             keyValue={stats[routeStat][routeOriginStat][key]}
@@ -82,4 +82,4 @@ const AuditStats = ({ stats, routeStat, routeOriginStat, setRoute, setBreadcrumb
   );
 };
 
-export default AuditStats;
+export default Stats;
