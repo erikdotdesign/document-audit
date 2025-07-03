@@ -1,4 +1,4 @@
-import { Route, Breadcrumb, StyleRouteType, navigate } from '../../routes';
+import { Route, Breadcrumb, RouteStatType, navigate } from '../../routes';
 import style from "../../style";
 import { formatNumber, camelCaseToTitleCase, camelCaseToSentenceLower, typedKeys, tallyValue } from "../../helpers";
 import { AuditStyleStats } from "../../audit/buildStats";
@@ -14,13 +14,13 @@ interface HomeProps {
 
 const Home = ({ stats, setRoute, setBreadcrumbs }: HomeProps) => {
 
-  const handleNavigate = (style: StyleRouteType) => {
-    navigate({ type: "style", style }, camelCaseToTitleCase(style), setRoute, setBreadcrumbs);
+  const handleNavigate = (routeStat: RouteStatType) => {
+    navigate({ type: "stat", stat: routeStat }, camelCaseToTitleCase(routeStat), setRoute, setBreadcrumbs);
   };
 
-  const getHighlightCount = (style: StyleRouteType) => {
-    const localValues = stats[style].local ? tallyValue(stats[style].local.count) : 0;
-    const remoteValues = stats[style].remote ? tallyValue(stats[style].remote.count) : 0;
+  const getHighlightCount = (routeStat: RouteStatType) => {
+    const localValues = stats[routeStat].local ? tallyValue(stats[routeStat].local.count) : 0;
+    const remoteValues = stats[routeStat].remote ? tallyValue(stats[routeStat].remote.count) : 0;
     return formatNumber(localValues + remoteValues);
   };
 

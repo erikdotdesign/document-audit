@@ -1,12 +1,12 @@
 import React from "react";
 
-export type StyleRouteType = "colorStyles" | "textStyles" | "effectStyles" | "gridStyles";
-export type StyleOriginRouteType = "local" | "remote";
+export type RouteStatType = "layers" | "variables" | "components" | "colorStyles" | "textStyles" | "effectStyles" | "gridStyles";
+export type RouteOriginStatType = "local" | "remote";
 
 export type Route =
   | { type: "home" }
-  | { type: "style"; style: StyleRouteType }
-  | { type: "styleOrigin"; style: StyleRouteType; origin: StyleOriginRouteType };
+  | { type: "stat"; stat: RouteStatType }
+  | { type: "originStat"; stat: RouteStatType; origin: RouteOriginStatType };
 
 export type Breadcrumb = {
   label: string;
