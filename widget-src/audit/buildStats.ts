@@ -102,9 +102,9 @@ type SharedComponentStats = {
   instances: number;
   variants: number;
   missingDescriptions: {
-    components: number;
-    sets: number;
-    variants: number;
+    component: number;
+    set: number;
+    variant: number;
   };
   overriddenInstances: number;
 };
@@ -115,9 +115,9 @@ const buildSharedComponentStats = (): SharedComponentStats => ({
   instances: 0,
   variants: 0,
   missingDescriptions: {
-    components: 0,
-    sets: 0,
-    variants: 0
+    component: 0,
+    set: 0,
+    variant: 0
   },
   overriddenInstances: 0
 });
@@ -239,7 +239,7 @@ export type FrameStats = {
   };
 };
 
-export const buildFrameStats = () => ({
+export const buildFrameStats = (): FrameStats => ({
   count: 0,
   freeFormLayouts: 0,
   autoLayouts: {
@@ -282,7 +282,64 @@ export const buildOriginFrameStats = (): OriginFrameStats => ({
   // remote: buildFrameStats()
 });
 
-export type AuditStyleStats = {
+export type LayerStats = {
+  count: {
+    page: number;
+    section: number;
+    group: number;
+    frame: number;
+    component: number;
+    componentSet: number;
+    componentInstance: number;
+    text: number;
+    shape: number;
+    booleanShape: number;
+    vector: number;
+    slice: number;
+  };
+  averageNestingDepth: number;
+  maxNestingDepth: number;
+  duplicateNames: number;
+  unnamedLayers: number;
+  hiddenLayers: number;
+  lockedLayers: number;
+};
+
+export const buildLayerStats = (): LayerStats => ({
+  count: {
+    page: 0,
+    section: 0,
+    group: 0,
+    frame: 0,
+    component: 0,
+    componentSet: 0,
+    componentInstance: 0,
+    text: 0,
+    shape: 0,
+    booleanShape: 0,
+    vector: 0,
+    slice: 0
+  },
+  averageNestingDepth: 0,
+  maxNestingDepth: 0,
+  duplicateNames: 0,
+  unnamedLayers: 0,
+  hiddenLayers: 0,
+  lockedLayers: 0
+})
+
+export type OriginLayerStats = {
+  local: LayerStats;
+  // remote: FrameStats;
+};
+
+export const buildOriginLayerStats = (): OriginLayerStats => ({
+  local: buildLayerStats(),
+  // remote: buildLayerStats()
+});
+
+export type AuditStats = {
+  layers: OriginLayerStats;
   variables: OriginVariableStats;
   colorStyles: OriginStyleStats<ColorStyleProps>;
   textStyles: OriginStyleStats<TextStyleProps>;
@@ -292,7 +349,8 @@ export type AuditStyleStats = {
   components: OriginComponentStats;
 };
 
-export const buildAuditStyleStats = (): AuditStyleStats => ({
+export const buildAuditStats = (): AuditStats => ({
+  layers: buildOriginLayerStats(),
   variables: buildOriginVariableStats(),
   colorStyles: buildOriginStyleStats(buildColorStyleProperties),
   textStyles: buildOriginStyleStats(buildTextStyleProperties),

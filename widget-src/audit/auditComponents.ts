@@ -13,9 +13,9 @@ export const auditMainComponent = (
     bucket.count++;
     if (node.parent?.type === "COMPONENT_SET") {
       bucket.variants++;
-      if (missingDescription) bucket.missingDescriptions.variants++;
+      if (missingDescription) bucket.missingDescriptions.variant++;
     } else {
-      if (missingDescription) bucket.missingDescriptions.components++;
+      if (missingDescription) bucket.missingDescriptions.component++;
     }
   }
 }
@@ -34,7 +34,7 @@ export const auditComponents = async (
     case "COMPONENT_SET": {
       const bucket = getComponentBucket(node, stats);
       bucket.sets++;
-      if (!node.description) bucket.missingDescriptions.sets++;
+      if (!node.description) bucket.missingDescriptions.set++;
       break;
     }
     case "INSTANCE": {

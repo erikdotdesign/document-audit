@@ -31,7 +31,10 @@ const Breadcrumbs = ({ breadcrumbs, setRoute, setBreadcrumbs }: BreadcrumbsProps
               fontFamily={style.fontFamily}
               fontSize={style.fontSize.shmedium}
               fontWeight={style.fontWeight.bold}
-              lineHeight={style.lineHeight.small}>
+              lineHeight={style.lineHeight.small}
+              hoverStyle={{
+                fill: i !== breadcrumbs.length - 1 ? style.color.black : style.color.gray
+              }}>
               {crumb.label}
             </Text>
             {

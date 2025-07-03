@@ -1,27 +1,24 @@
-import { AuditStyleStats, buildAuditStyleStats } from './audit/buildStats';
+import { AuditStats, buildAuditStats } from './audit/buildStats';
 import { auditFigmaDocument } from './audit/processNodes';
+import { Route, Breadcrumb } from './routes';
+import Header from './components/Header';
+import Router from './components/views/Router';
+import Footer from './components/Footer';
 import style from './style';
-import DisplayStat from './DisplayStat';
-import Header from './Header';
-import Footer from './Footer';
-import StatDetails from './StatDetails';
 
 const { widget } = figma;
-const {
-  useSyncedState,
-  AutoLayout,
-  useEffect,
-  waitForTask,
-} = widget;
+const { useSyncedState, AutoLayout, waitForTask, useEffect } = widget;
 
-const Widget = () => {
-  const [stats, setStats] = useSyncedState<AuditStyleStats>('stats', buildAuditStyleStats());
+export const Widget = () => {
+  const defaultRoute: Route = { type: "home" };
+  const [stats, setStats] = useSyncedState<AuditStats>('stats', buildAuditStats());
   const [lastAuditKey, setLastAuditKey] = useSyncedState<number>('lastAuditKey', 0);
   const [currentAuditKey, setCurrentAuditKey] = useSyncedState<number>('currentAuditKey', Date.now());
   const [loading, setLoading] = useSyncedState<boolean>('loading', true);
-  const [route, setRoute] = useSyncedState<string>('route', '');
+  const [route, setRoute] = useSyncedState<Route>("route", defaultRoute);
+  const [breadcrumbs, setBreadcrumbs] = useSyncedState<Breadcrumb[]>("breadcrumbs", [{ route: defaultRoute, label: "Document Audit" }]);
 
-  // 🔁 Fully recursive hydration
+  // Fully recursive hydration
   const hydrateNode = (node: SceneNode) => {
     void node.type;
     void node.name;
@@ -42,12 +39,11 @@ const Widget = () => {
   const runAuditOnce = async () => {
     if (currentAuditKey === lastAuditKey) {
       console.log("📦 Audit already up to date");
-      console.log(stats);
       return;
     }
     
     figma.notify('Auditing 🔎', { timeout: Infinity });
-    await new Promise((res) => setTimeout(res, 0)); // defer until Figma's graph is ready
+    await new Promise((res) => setTimeout(res, 0)); // allow widget to be painted
     console.log("⏳ Starting scene graph hydration...");
     await hydrateSceneGraph();
 
@@ -63,39 +59,26 @@ const Widget = () => {
 
   useEffect(() => {
     waitForTask(runAuditOnce().catch(console.error));
-  }, [currentAuditKey]); // 🔁 Rerun only if the trigger changes
+  }, [currentAuditKey]);
 
   return (
-    <AutoLayout
+    <AutoLayout 
       direction="vertical"
       width={834}
       height={1194}
       fill={style.color.white}
       stroke={style.color.black}
       strokeWidth={8}
-      padding={style.spacing.small}>
+      padding={style.padding.small}>
       <Header 
+        breadcrumbs={breadcrumbs}
+        setRoute={setRoute}
+        setBreadcrumbs={setBreadcrumbs} />
+      <Router 
         route={route}
-        setRoute={setRoute} />
-      {
-        route === ''
-        ? <AutoLayout
-            direction="vertical"
-            height={"fill-parent"}
-            width={'fill-parent'}>
-            {
-              displayStats.map((stat) => (
-                <DisplayStat
-                  key={stat.label}
-                  highlight={stat.highlight}
-                  label={stat.label}
-                  route={stat.route}
-                  setRoute={setRoute} />
-              ))
-            }
-          </AutoLayout>
-        : null
-      }
+        stats={stats}
+        setRoute={setRoute}
+        setBreadcrumbs={setBreadcrumbs} />
       <Footer 
         lastAuditKey={lastAuditKey}
         loading={loading}

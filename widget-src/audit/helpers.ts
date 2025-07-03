@@ -1,4 +1,14 @@
-import { LocalStyleStats, OriginComponentStats, OriginStyleStats, RemoteStyleStats, LocalComponentStats, RemoteComponentStats, OriginVariableStats, LocalVariableStats, RemoteVariableStats, OriginFrameStats, FrameStats } from "./buildStats";
+import { 
+  LocalStyleStats, 
+  OriginComponentStats, 
+  OriginStyleStats, 
+  RemoteStyleStats, 
+  LocalComponentStats, 
+  RemoteComponentStats, 
+  OriginVariableStats, 
+  LocalVariableStats, 
+  RemoteVariableStats
+} from "./buildStats";
 
 type NodeStyleId = "fillStyleId" | "strokeStyleId" | "textStyleId" | "effectStyleId" | "gridStyleId";
 
@@ -143,3 +153,25 @@ export const getVariableBucket = (
 ): LocalVariableStats | RemoteVariableStats => {
   return variable.remote ? stats.remote : stats.local;
 };
+
+export const getLayerDepth = (node: SceneNode | PageNode): number => {
+  let depth = 0;
+  if (node.type !== "PAGE") {
+    let parent = node.parent;
+    while (parent && parent.type !== "PAGE") {
+      depth++;
+      parent = parent.parent;
+    }
+  }
+  return depth;
+};
+
+export type LayerMetaData = {
+  totalLayerDepth: number;
+  duplicateLayerNames: Map<string, number>;
+};
+
+export const buildLayerMetaData = () => ({
+  totalLayerDepth: 0,
+  duplicateLayerNames: new Map<string, number>()
+});
