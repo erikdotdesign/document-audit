@@ -2,6 +2,8 @@
 
 This project provides a comprehensive structure for tracking and analyzing statistics from a Figma document. The audit includes insights into layers, variables, styles, frames, and components — both local and remote — along with usage, bindings, and metadata completeness.
 
+![Screenshot](screenshot.png)
+
 ## AuditStats Schema Overview
 
 The root object `AuditStats` includes the following categories:
