@@ -1,9 +1,9 @@
-import { OriginStyleStats, ColorStyleProps } from "./buildStats";
-import { getStyleBucket } from "./helpers";
+import { OriginStyleStats, ColorStyleProps, ColorStyleExtras } from "./buildStats";
+import { getStyleBucket, screamingSnakeToCamel } from "./helpers";
 
 export const auditPaintStyles = async (
   paintStylesIds: Set<string>,
-  stats: OriginStyleStats<ColorStyleProps>
+  stats: OriginStyleStats<ColorStyleProps, ColorStyleExtras>
 ) => {
   const colorTokenIds = new Set<string>();
   const colorStopTokenIds = new Set<string>();
@@ -30,6 +30,8 @@ export const auditPaintStyles = async (
     if (!style.description) bucket.missingDescriptions++;
 
     for (const paint of style.paints) {
+      bucket.paints[screamingSnakeToCamel(paint.type)]++;
+      
       if (paint.type === "SOLID") {
         const bound = paint.boundVariables?.color;
         if (bound) {

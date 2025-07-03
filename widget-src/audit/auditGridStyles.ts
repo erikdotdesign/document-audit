@@ -1,9 +1,9 @@
-import { OriginStyleStats, GridStyleProps } from "./buildStats";
-import { getStyleBucket } from "./helpers";
+import { OriginStyleStats, GridStyleProps, GridStyleExtras } from "./buildStats";
+import { getStyleBucket, screamingSnakeToCamel } from "./helpers";
 
 export const auditGridStyles = async (
   gridStyleIds: Set<string>,
-  stats: OriginStyleStats<GridStyleProps>
+  stats: OriginStyleStats<GridStyleProps, GridStyleExtras>
 ) => {
   const gridTokenIds: Record<keyof GridStyleProps, Set<string>> = {
     sectionSize: new Set(),
@@ -29,6 +29,8 @@ export const auditGridStyles = async (
 
     for (const grid of style.layoutGrids) {
       const boundVariables = grid.boundVariables || {};
+      bucket.grids[screamingSnakeToCamel(grid.pattern)]++;
+
       for (const key of Object.keys(gridTokenIds) as (keyof GridStyleProps)[]) {
         if (key in grid) {
           const token = boundVariables[key];

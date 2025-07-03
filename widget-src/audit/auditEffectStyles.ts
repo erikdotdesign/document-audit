@@ -1,9 +1,9 @@
-import { OriginStyleStats, EffectStyleProps } from "./buildStats";
-import { getStyleBucket } from "./helpers";
+import { OriginStyleStats, EffectStyleProps, EffectStyleExtras } from "./buildStats";
+import { getStyleBucket, screamingSnakeToCamel } from "./helpers";
 
 export const auditEffectStyles = async (
   effectStyleIds: Set<string>,
-  stats: OriginStyleStats<EffectStyleProps>
+  stats: OriginStyleStats<EffectStyleProps, EffectStyleExtras>
 ) => {
   const effectTokenIds: Record<keyof EffectStyleProps, Set<string>> = {
     radius: new Set(),
@@ -29,6 +29,7 @@ export const auditEffectStyles = async (
     if (!style.description) bucket.missingDescriptions++;
 
     for (const effect of style.effects) {
+      bucket.effects[screamingSnakeToCamel(effect.type)]++;
       if (effect.type === "NOISE" || effect.type === "TEXTURE") return;
       const boundVariables = effect.boundVariables || {};
 

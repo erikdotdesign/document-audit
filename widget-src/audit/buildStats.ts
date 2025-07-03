@@ -58,42 +58,55 @@ const buildGridStyleProperties = (): GridStyleProps => ({
 	gutterSize: 0
 });
 
-type SharedStyleStats<T> = {
+type SharedStyleStats<T, Extras = object> = {
   count: number;
   unboundProperties: T;
   uniquePropertyTokens: T;
   missingDescriptions: number;
-};
+} & Extras;
 
-const buildSharedStyleStats = <T>(propertiesConstructor: () => T): SharedStyleStats<T> => ({
+const buildSharedStyleStats = <T, Extras>(
+  propertiesConstructor: () => T,
+  extrasConstructor: () => Extras
+): SharedStyleStats<T, Extras> => ({
   count: 0,
+  ...extrasConstructor(),
   unboundProperties: propertiesConstructor(),
   uniquePropertyTokens: propertiesConstructor(),
   missingDescriptions: 0,
 });
 
-export type LocalStyleStats<T> = SharedStyleStats<T> & {
+export type LocalStyleStats<T, Extras> = SharedStyleStats<T, Extras> & {
   unused: number;
 };
 
-export const buildLocalStyleStats = <T>(props: () => T): LocalStyleStats<T> => ({
-  ...buildSharedStyleStats(props),
+export const buildLocalStyleStats = <T, Extras>(
+  props: () => T,
+  extras: () => Extras
+): LocalStyleStats<T, Extras> => ({
+  ...buildSharedStyleStats(props, extras),
   unused: 0
 });
 
-export type RemoteStyleStats<T> = SharedStyleStats<T>;
+export type RemoteStyleStats<T, Extras> = SharedStyleStats<T, Extras>;
 
-export const buildRemoteStyleStats = <T>(props: () => T): RemoteStyleStats<T> =>
-  buildSharedStyleStats(props);
+export const buildRemoteStyleStats = <T, Extras>(
+  props: () => T,
+  extras: () => Extras
+): RemoteStyleStats<T, Extras> =>
+  buildSharedStyleStats(props, extras);
 
-export type OriginStyleStats<T> = {
-  local: LocalStyleStats<T>;
-  remote: RemoteStyleStats<T>;
+export type OriginStyleStats<T, Extras> = {
+  local: LocalStyleStats<T, Extras>;
+  remote: RemoteStyleStats<T, Extras>;
 };
 
-export const buildOriginStyleStats = <T>(propertiesConstructor: () => T): OriginStyleStats<T> => ({
-  local: buildLocalStyleStats(propertiesConstructor),
-  remote: buildRemoteStyleStats(propertiesConstructor)
+export const buildOriginStyleStats = <T, Extras>(
+  propertiesConstructor: () => T,
+  extrasConstructor: () => Extras
+): OriginStyleStats<T, Extras> => ({
+  local: buildLocalStyleStats(propertiesConstructor, extrasConstructor),
+  remote: buildRemoteStyleStats(propertiesConstructor, extrasConstructor)
 });
 
 type SharedComponentStats = {
@@ -338,13 +351,77 @@ export const buildOriginLayerStats = (): OriginLayerStats => ({
   // remote: buildLayerStats()
 });
 
+export type ColorStyleExtras = {
+  paints: {
+    solid: number;
+    gradientLinear: number;
+    gradientRadial: number;
+    gradientAngular: number;
+    gradientDiamond: number;
+    pattern: number;
+    image: number;
+    video: number;
+  };
+};
+
+const buildColorStyleExtras = (): ColorStyleExtras => ({
+  paints: {
+    solid: 0,
+    gradientLinear: 0,
+    gradientRadial: 0,
+    gradientAngular: 0,
+    gradientDiamond: 0,
+    pattern: 0,
+    image: 0,
+    video: 0
+  }
+});
+
+export type EffectStyleExtras = {
+  effects: {
+    dropShadow: number;
+    innerShadow: number;
+    layerBlur: number;
+    backgroundBlur: number;
+    noise: number;
+    texture: number;
+  };
+};
+
+const buildEffectStyleExtras = (): EffectStyleExtras => ({
+  effects: {
+    dropShadow: 0,
+    innerShadow: 0,
+    layerBlur: 0,
+    backgroundBlur: 0,
+    noise: 0,
+    texture: 0
+  }
+});
+
+export type GridStyleExtras = {
+  grids: {
+    grid: number;
+    columns: number;
+    rows: number;
+  };
+};
+
+const buildGridStyleExtras = (): GridStyleExtras => ({
+  grids: {
+    grid: 0,
+    columns: 0,
+    rows: 0
+  }
+});
+
 export type AuditStats = {
   layers: OriginLayerStats;
   variables: OriginVariableStats;
-  colorStyles: OriginStyleStats<ColorStyleProps>;
-  textStyles: OriginStyleStats<TextStyleProps>;
-  effectStyles: OriginStyleStats<EffectStyleProps>;
-  gridStyles: OriginStyleStats<GridStyleProps>;
+  colorStyles: OriginStyleStats<ColorStyleProps, ColorStyleExtras>;
+  textStyles: OriginStyleStats<TextStyleProps, null>;
+  effectStyles: OriginStyleStats<EffectStyleProps, EffectStyleExtras>;
+  gridStyles: OriginStyleStats<GridStyleProps, GridStyleExtras>;
   frames: OriginFrameStats;
   components: OriginComponentStats;
 };
@@ -352,10 +429,10 @@ export type AuditStats = {
 export const buildAuditStats = (): AuditStats => ({
   layers: buildOriginLayerStats(),
   variables: buildOriginVariableStats(),
-  colorStyles: buildOriginStyleStats(buildColorStyleProperties),
-  textStyles: buildOriginStyleStats(buildTextStyleProperties),
-  effectStyles: buildOriginStyleStats(buildEffectStyleProperties),
-  gridStyles: buildOriginStyleStats(buildGridStyleProperties),
+  colorStyles: buildOriginStyleStats<ColorStyleProps, ColorStyleExtras>(buildColorStyleProperties, buildColorStyleExtras),
+  textStyles: buildOriginStyleStats(buildTextStyleProperties, () => null),
+  effectStyles: buildOriginStyleStats<EffectStyleProps, EffectStyleExtras>(buildEffectStyleProperties, buildEffectStyleExtras),
+  gridStyles: buildOriginStyleStats<GridStyleProps, GridStyleExtras>(buildGridStyleProperties, buildGridStyleExtras),
   frames: buildOriginFrameStats(),
   components: buildOriginComponentStats()
 });

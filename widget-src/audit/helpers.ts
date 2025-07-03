@@ -133,10 +133,10 @@ export const buildFramePropsMap = (): FramePropMap[] => {
   ];
 }
 
-export const getStyleBucket = <T>(
+export const getStyleBucket = <T, Extras>(
   style: BaseStyle,
-  stats: OriginStyleStats<T>
-): LocalStyleStats<T> | RemoteStyleStats<T> => {
+  stats: OriginStyleStats<T, Extras>
+): LocalStyleStats<T, Extras> | RemoteStyleStats<T, Extras> => {
   return style.remote ? stats.remote : stats.local;
 };
 
@@ -175,3 +175,13 @@ export const buildLayerMetaData = () => ({
   totalLayerDepth: 0,
   duplicateLayerNames: new Map<string, number>()
 });
+
+export const screamingSnakeToCamel = (input: string): string => {
+  return input
+    .toLowerCase()
+    .split('_')
+    .map((word, index) =>
+      index === 0 ? word : word[0].toUpperCase() + word.slice(1)
+    )
+    .join('');
+};
